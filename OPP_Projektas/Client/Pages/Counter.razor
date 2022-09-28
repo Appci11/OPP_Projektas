@@ -1,18 +1,105 @@
 ﻿@page "/counter"
+@using Microsoft.AspNetCore.SignalR.Client
+@using OPP_Projektas.Shared.Models.Enums.Slots
+@using OPP_Projektas.Shared.Models.Slots
+@inject NavigationManager NavigationManager
 
 <PageTitle>Counter</PageTitle>
 
 <h1>Counter</h1>
 
-<p role="status">Current count: @currentCount</p>
+<input @bind="Name" />
+<p role="status">Balance: @Balance</p>
+<p role="status">@Message</p>
+<div style="display: flex">
+    <div style="@StyleForSymbol(Results[0])">
 
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+    </div>
+    <div style="@StyleForSymbol(Results[1])">
+
+    </div>
+    <div style="@StyleForSymbol(Results[2])">
+    </div>
+</div>
+
+<input @bind="BetSize" type="number" />
+<button class="btn btn-primary" @onclick="Play">Click me</button>
+
+<ul style="width: 300px">
+    @foreach (var message in Messages)
+    {
+        <li>@message</li>
+    }
+</ul>
 
 @code {
-    private int currentCount = 0;
+    private HubConnection? hubConnection;
+    private int Balance = 500;
+    public int BetSize { get; set; } = 1;
+    public string Message { get; set; }
+    public string Name { get; set; } = "Guest";
+    public List<string> Messages { get; set; } = new List<string>();
+    public List<Symbols> Results { get; set; } = new List<Symbols> {Symbols.Orange, Symbols.Orange, Symbols.Orange};
 
-    private void IncrementCount()
+    protected override async Task OnInitializedAsync()
     {
-        currentCount++;
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/slotshub"))
+            .Build();
+
+        hubConnection.On<SlotsResult>("SlotResult", async (result) =>
+        {
+            Results = result.Symbols;
+            Balance += result.Payout;
+            if (result.Payout > 150)
+            {
+                await hubConnection.SendAsync("BroadcastWin", Name, result.Payout);
+            }
+            if (result.Payout == 0)
+            {
+                Message = "YOU LOST!!";
+            }
+            else
+            {
+                Message = $"WINNNEEEERRRR +{result.Payout}";
+            }
+            InvokeAsync(StateHasChanged);
+        });
+
+        hubConnection.On<string>("WinBroadcasted", (result) =>
+        {
+            Messages.Insert(0, result);
+            InvokeAsync(StateHasChanged);
+        });
+
+        await hubConnection.StartAsync();
+    }
+
+    private async Task Play()
+    {
+        if (hubConnection is not null)
+        {
+            Balance -= BetSize;
+            await hubConnection.SendAsync("Play", Name, BetSize);
+        }
+    }
+
+    private string StyleForSymbol(Symbols symbol)
+    {
+        switch (symbol)
+        {
+            case Symbols.Orange:
+                return "background-color: #FFA500; width: 100px; height: 100px;";
+            case Symbols.Red:
+                return "background-color: #FF0000; width: 100px; height: 100px;";
+            case Symbols.Blue:
+                return "background-color: #0000FF; width: 100px; height: 100px;";
+            case Symbols.Green:
+                return "background-color: #00FF00; width: 100px; height: 100px;";
+            case Symbols.Yellow:
+                return "background-color: #FFFF00; width: 100px; height: 100px;";
+            default:
+                return "background-color: #FFFFFF; width: 100px; height: 100px;";
+        }
     }
 }

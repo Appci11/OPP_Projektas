@@ -8,11 +8,18 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.9" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Client\OPP_Projektas.Client.csproj" />
     <ProjectReference Include="..\Shared\OPP_Projektas.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="GameHubs\" />
+    <Folder Include="Models\BlackJack\" />
+    <Folder Include="Models\Slots\" />
   </ItemGroup>
 
 

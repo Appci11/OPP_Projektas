@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.ResponseCompression;
+using OPP_Projektas.Server.GameHubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +7,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+builder.Services.AddSignalR();
+builder.Services.AddResponseCompression(opts =>
+{
+    opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+        new[] { "application/octet-stream" });
+});
 
 var app = builder.Build();
 
@@ -23,6 +30,7 @@ else
 
 app.UseHttpsRedirection();
 
+app.UseResponseCompression();
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
 
@@ -32,5 +40,7 @@ app.UseRouting();
 app.MapRazorPages();
 app.MapControllers();
 app.MapFallbackToFile("index.html");
+
+app.MapHub<SlotsHub>("/slotshub");
 
 app.Run();

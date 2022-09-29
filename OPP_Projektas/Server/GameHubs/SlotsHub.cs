@@ -16,4 +16,5 @@ public class SlotsHub : Hub
         Console.WriteLine($"{playerName} - {winSize}");
         await Clients.All.SendAsync("WinBroadcasted", $"{playerName} just won ${winSize}!!!!");
     }
+
 }

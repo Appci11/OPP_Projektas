@@ -6,22 +6,28 @@
 
 <PageTitle>Counter</PageTitle>
 
+<div style="display:flex">
+<div>
 <h1>Counter</h1>
 
+
+
 <input @bind="Name" />
+
 <p role="status">Balance: @Balance</p>
 <p role="status">@Message</p>
+
 <div style="display: flex">
-    <!--<div style="@StyleForSymbol(Results[0])">
+    <div style="@StyleForSymbol(Results[0])">
 
     </div>
     <div style="@StyleForSymbol(Results[1])">
 
     </div>
     <div style="@StyleForSymbol(Results[2])">
-    </div>-->
+    </div>
 
-    <div style="@slot1Style">
+    <!--<div style="@slot1Style">
 
     </div>
     <div style="@slot2Style">
@@ -29,7 +35,32 @@
     </div>
     <div style="@slot3Style">
 
-    </div>
+    </div>-->
+</div>
+</div>
+<div style="margin: 50px">
+    <h2>REWARDS:</h2>
+        <div style="display:flex;">
+            <div style="background-color: #0000FF; width: 30px; height: 30px; margin: 10px;"></div>
+            <p style="margin-top:12px"> – x5</p>
+        </div>
+        <div style="display:flex;">
+            <div style="background-color: #FF0000; width: 30px; height: 30px; margin: 10px;"></div>
+            <p style="margin-top:12px"> – x10</p>
+        </div>
+        <div style="display:flex;">
+            <div style="background-color: #00FF00; width: 30px; height: 30px; margin: 10px;"></div>
+            <p style="margin-top:12px"> – x40</p>
+        </div>
+        <div style="display:flex;">
+            <div style="background-color: #FFFF00; width: 30px; height: 30px; margin: 10px;"></div>
+            <p style="margin-top:12px"> – x160</p>
+        </div>
+        <div style="display:flex;">
+            <div style="background-color: #FFA500; width: 30px; height: 30px; margin: 10px;"></div>
+            <p style="margin-top:12px"> – x1000</p>
+        </div>
+</div>
 </div>
 
 <input @bind="BetSize" type="number" />
@@ -63,7 +94,11 @@
         {
             Random rand = new Random();
             for(int i = 0;i<3;i++){
-                for (int j = 0; j < 20; j++)
+                int switchingAmount = 30;
+                if(i>0){
+                    switchingAmount /= 2;
+                }
+                for (int j = 0; j < switchingAmount; j++)
                 {
                     switch(i){
                         case 0:
@@ -86,7 +121,8 @@
                             break;
                     }
 
-                    Thread.Sleep(50);
+                    await Task.Delay(50);
+                    //Thread.Sleep(50);
                     
                     await InvokeAsync(StateHasChanged);
                     //StateHasChanged();

@@ -26,16 +26,6 @@
     </div>
     <div style="@StyleForSymbol(Results[2])">
     </div>
-
-    <!--<div style="@slot1Style">
-
-    </div>
-    <div style="@slot2Style">
-
-    </div>
-    <div style="@slot3Style">
-
-    </div>-->
 </div>
 </div>
 <div style="margin: 50px">
@@ -75,9 +65,7 @@
 @code {
     private HubConnection? hubConnection;
     private int Balance = 500;
-    private string slot1Style = "background-color: #FFA500; width: 100px; height: 100px; margin: 10px;";
-    private string slot2Style = "background-color: #FFA500; width: 100px; height: 100px; margin: 10px;";
-    private string slot3Style = "background-color: #FFA500; width: 100px; height: 100px; margin: 10px;";
+
     public int BetSize { get; set; } = 1;
     public string Message { get; set; }
     public string Name { get; set; } = "Guest";
@@ -103,29 +91,16 @@
                     switch(i){
                         case 0:
                             Results = new List<Symbols> { (Symbols)rand.Next(0, 5), (Symbols)rand.Next(0, 5), (Symbols)rand.Next(0, 5) };
-                            slot1Style = StyleForSymbol(Results[0]); slot2Style = StyleForSymbol(Results[1]);slot3Style = StyleForSymbol(Results[2]);
-                            InvokeAsync(StateHasChanged);
-                            //StateHasChanged();
                             break;
                         case 1:
                             Results = new List<Symbols> { Results[0], (Symbols)rand.Next(0, 5), (Symbols)rand.Next(0, 5) };
-                            slot1Style = StyleForSymbol(Results[0]); slot2Style = StyleForSymbol(Results[1]); slot3Style = StyleForSymbol(Results[2]);
-                            InvokeAsync(StateHasChanged);
-                            //StateHasChanged();
                             break;
                         case 2:
                             Results = new List<Symbols> { Results[0], Results[1], (Symbols)rand.Next(0, 5) };
-                            slot1Style = StyleForSymbol(Results[0]); slot2Style = StyleForSymbol(Results[1]); slot3Style = StyleForSymbol(Results[2]);
-                            InvokeAsync(StateHasChanged);
-                            StateHasChanged();
                             break;
                     }
-
                     await Task.Delay(50);
-                    //Thread.Sleep(50);
-                    
                     await InvokeAsync(StateHasChanged);
-                    //StateHasChanged();
                 }
                 Results[i] = result.Symbols[i];
             }

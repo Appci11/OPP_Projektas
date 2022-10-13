@@ -37,15 +37,15 @@ public class Slots
         var symbolValues = new List<SymbolTier>();
         var payout = 0;
 
-        if (number == 1000)
+        if (number >= 999)
         {
-            payout = betAmount * payouts[SymbolTier.First];
-            symbolValues = new List<SymbolTier> {SymbolTier.First, SymbolTier.First, SymbolTier.First};
-        } 
+            payout = betAmount * payouts[SymbolTier.Fifth];
+            symbolValues = new List<SymbolTier> { SymbolTier.Fifth, SymbolTier.Fifth, SymbolTier.Fifth };
+        }
         if (number >= 995)
         {
-            payout = betAmount * payouts[SymbolTier.Second];
-            symbolValues = new List<SymbolTier> { SymbolTier.Second, SymbolTier.Second, SymbolTier.Second };
+            payout = betAmount * payouts[SymbolTier.Fourth];
+            symbolValues = new List<SymbolTier> { SymbolTier.Fourth, SymbolTier.Fourth, SymbolTier.Fourth };
         }
         if (number >= 990)
         {
@@ -54,14 +54,18 @@ public class Slots
         }
         if (number >= 950)
         {
-            payout = betAmount * payouts[SymbolTier.Fourth];
-            symbolValues = new List<SymbolTier> { SymbolTier.Fourth, SymbolTier.Fourth, SymbolTier.Fourth };
+            payout = betAmount * payouts[SymbolTier.Second];
+            symbolValues = new List<SymbolTier> { SymbolTier.Second, SymbolTier.Second, SymbolTier.Second };
         }
-        if (number >= 900)
+        if (number == 800)
         {
-            payout = betAmount * payouts[SymbolTier.Fifth];
-            symbolValues = new List<SymbolTier> { SymbolTier.Fifth, SymbolTier.Fifth, SymbolTier.Fifth };
-        }
+            payout = betAmount * payouts[SymbolTier.First];
+            symbolValues = new List<SymbolTier> {SymbolTier.First, SymbolTier.First, SymbolTier.First};
+        } 
+        
+        
+        
+        
 
         if (!symbolValues.Any())
         {

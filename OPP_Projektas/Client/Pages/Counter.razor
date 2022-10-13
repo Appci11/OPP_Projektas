@@ -22,9 +22,9 @@
 <div style="display: flex">
     <div style="@Results[0].Render()">
     </div>
-    <div style="@Results[0].Render()">
+    <div style="@Results[1].Render()">
     </div>
-    <div style="@Results[0].Render()">
+    <div style="@Results[2].Render()">
     </div>
 </div>
 </div>
@@ -102,18 +102,20 @@
 
     protected override async Task OnInitializedAsync()
     {
-        hubConnection = new HubConnectionBuilder()
-            .WithUrl(NavigationManager.ToAbsoluteUri("/slotshub"))
-            .Build();
-
         SlotRoller roller = new ColorSlotRoller();
         Results.Add(roller.CreateSymbol(SymbolTier.Fifth));
         Results.Add(roller.CreateSymbol(SymbolTier.Fifth));
         Results.Add(roller.CreateSymbol(SymbolTier.Fifth));
 
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/slotshub")).WithAutomaticReconnect()
+            .Build();
+
+        hubConnection.On("Test", () => { Console.WriteLine("Test"); });
+
         hubConnection.On<SlotsResult>("Something", async (result) =>
         {
-            Console.WriteLine("Test");
+            Console.WriteLine("Tester2");
             SlotRoller fakeResultRoller;
             fakeResultRoller = IsPictureSymbols ? new PictureSlotRoller() : new ColorSlotRoller();
             Random rand = new Random();
@@ -138,10 +140,9 @@
                     await Task.Delay(50);
                     await InvokeAsync(StateHasChanged);
                 }
-                Results[i] = result.SlotSymbols[i];
+                Results[i] = fakeResultRoller.CreateSymbol(result.SlotSymbols[i]);
             }
-
-            Results = result.SlotSymbols;
+            
             Balance += result.Payout;
             if (result.Payout > 150)
             {

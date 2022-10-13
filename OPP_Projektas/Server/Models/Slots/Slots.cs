@@ -35,7 +35,7 @@ public class Slots
 
         var number = rng.Next(1000 + 25) - 24;
         var symbolValues = new List<SymbolTier>();
-        var payout = -1;
+        var payout = 0;
 
         if (number == 1000)
         {
@@ -89,10 +89,6 @@ public class Slots
             slotSymbols.Add(roller.CreateSymbol(symbolValues[i]));
         }
 
-        return new SlotsResult()
-        {
-            Payout = payout,
-            SlotSymbols = slotSymbols
-        };
+        return new SlotsResult(symbolValues, payout);
     }
 }

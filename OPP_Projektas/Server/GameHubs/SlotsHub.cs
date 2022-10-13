@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using OPP_Projektas.Server.Models.Slots;
+using OPP_Projektas.Shared.Models.Enums.Slots;
+using OPP_Projektas.Shared.Models.Slots;
+using OPP_Projektas.Shared.Models.Slots.SlotSymbols;
 
 namespace OPP_Projektas.Server.GameHubs;
 
@@ -9,7 +12,8 @@ public class SlotsHub : Hub
     {
         var slots = Slots.GetInstance();
         var win = slots.Play(betSize, isPictureSymbols);
-        await Clients.Caller.SendAsync("Something", win);
+        await Clients.Caller.SendAsync("Test");
+        await Clients.Caller.SendAsync("Something",  win);
         Console.WriteLine("Sent message");
     }
 

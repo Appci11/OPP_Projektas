@@ -29,5 +29,23 @@ namespace UnitTests
                </button>
            ");
         }
+
+        [Fact]
+        public void RenderParagraphCorrectlyWithInitialZero()
+        {
+            IRenderedComponent<CounterComponent>? cut = RenderComponent<CounterComponent>();
+            cut.Find(cssSelector: "p")
+            .MarkupMatches(@"<p role=""status"">Current count: 0</p>");
+        }
+
+        [Fact]
+        public void IncrementCounterWhenButtonIsClicked()
+        {
+            IRenderedComponent<CounterComponent>? cut = RenderComponent<CounterComponent>();
+            cut.Find(cssSelector: "button")
+            .Click();
+            cut.Find(cssSelector: "p")
+            .MarkupMatches(@"<p role=""status"">Current count: 1</p>");
+        }
     }
 }

@@ -11,6 +11,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\Enums\Slots\" />
+    <Folder Include="Models\Slots\SlotSymbols\Rollers\" />
   </ItemGroup>
 </Project>

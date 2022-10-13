@@ -1,77 +1,98 @@
 ﻿using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using OPP_Projektas.Shared.Models.Enums.Slots;
 using OPP_Projektas.Shared.Models.Slots;
+using OPP_Projektas.Shared.Models.Slots.SlotSymbols;
+using OPP_Projektas.Shared.Models.Slots.SlotSymbols.Rollers;
 
 namespace OPP_Projektas.Server.Models.Slots;
 
-public static class Slots
+public class Slots
 {
+    private static Slots? _instance = null;
 
-    private static readonly Dictionary<Symbols, int> payouts = new Dictionary<Symbols, int>
+    public static Slots GetInstance()
     {
-        {Symbols.Blue, 5},
-        {Symbols.Red, 10},
-        {Symbols.Green, 40},
-        {Symbols.Yellow, 160},
-        {Symbols.Orange, 1000},
+        if (_instance == null)
+        {
+            _instance = new Slots();
+        }
+
+        return _instance;
+    }
+    private readonly Dictionary<SymbolTier, int> payouts = new Dictionary<SymbolTier, int>
+    {
+        {SymbolTier.First, 5},
+        {SymbolTier.Second, 10},
+        {SymbolTier.Third, 40},
+        {SymbolTier.Fourth, 160},
+        {SymbolTier.Fifth, 1000},
     };
 
-    public static SlotsResult Play(int betAmount)
+    public SlotsResult Play(int betAmount, bool isPictureSymbols)
     {
         var rng = new Random(Guid.NewGuid().GetHashCode());
 
         var number = rng.Next(1000 + 25) - 24;
+        var symbolValues = new List<SymbolTier>();
+        var payout = -1;
 
         if (number == 1000)
         {
-            return new SlotsResult
-            {
-                Payout = betAmount * payouts[Symbols.Orange],
-                Symbols = new List<Symbols> { Symbols.Orange, Symbols.Orange, Symbols.Orange}
-            };
+            payout = betAmount * payouts[SymbolTier.First];
+            symbolValues = new List<SymbolTier> {SymbolTier.First, SymbolTier.First, SymbolTier.First};
         } 
         if (number >= 995)
         {
-            return new SlotsResult
-            {
-                Payout = betAmount * payouts[Symbols.Yellow],
-                Symbols = new List<Symbols> { Symbols.Yellow, Symbols.Yellow, Symbols.Yellow }
-            };
+            payout = betAmount * payouts[SymbolTier.Second];
+            symbolValues = new List<SymbolTier> { SymbolTier.Second, SymbolTier.Second, SymbolTier.Second };
         }
         if (number >= 990)
         {
-            return new SlotsResult
-            {
-                Payout = betAmount * payouts[Symbols.Green],
-                Symbols = new List<Symbols> { Symbols.Green, Symbols.Green, Symbols.Green }
-            };
+            payout = betAmount * payouts[SymbolTier.Third];
+            symbolValues = new List<SymbolTier> { SymbolTier.Third, SymbolTier.Third, SymbolTier.Third };
         }
         if (number >= 950)
         {
-            return new SlotsResult
-            {
-                Payout = betAmount * payouts[Symbols.Red],
-                Symbols = new List<Symbols> { Symbols.Red, Symbols.Red, Symbols.Red }
-            };
+            payout = betAmount * payouts[SymbolTier.Fourth];
+            symbolValues = new List<SymbolTier> { SymbolTier.Fourth, SymbolTier.Fourth, SymbolTier.Fourth };
         }
         if (number >= 900)
         {
-            return new SlotsResult
-            {
-                Payout = betAmount * payouts[Symbols.Blue],
-                Symbols = new List<Symbols> { Symbols.Blue, Symbols.Blue, Symbols.Blue }
-            };
+            payout = betAmount * payouts[SymbolTier.Fifth];
+            symbolValues = new List<SymbolTier> { SymbolTier.Fifth, SymbolTier.Fifth, SymbolTier.Fifth };
         }
 
-        var symbols = new List<Symbols>() {Symbols.Orange, Symbols.Orange, Symbols.Orange};
-        while (!symbols.Distinct().Skip(1).Any())
+        if (!symbolValues.Any())
         {
-            symbols = new List<Symbols> { (Symbols)rng.Next(0, 5), (Symbols)rng.Next(0, 5), (Symbols)rng.Next(0, 5)};
+            symbolValues = new List<SymbolTier>() {SymbolTier.Fifth, SymbolTier.Fifth, SymbolTier.Fifth};
+            while (!symbolValues.Distinct().Skip(1).Any())
+            {
+                symbolValues = new List<SymbolTier>
+                    {(SymbolTier) rng.Next(0, 5), (SymbolTier) rng.Next(0, 5), (SymbolTier) rng.Next(0, 5)};
+            }
         }
+
+        var slotSymbols = new List<ISlotSymbol>();
+        SlotRoller roller;
+        if (isPictureSymbols)
+        {
+            roller = new PictureSlotRoller();
+        }
+        else
+        {
+            roller = new ColorSlotRoller();
+        }
+
+        for (int i = 0; i < 3; i++)
+        {
+            slotSymbols.Add(roller.CreateSymbol(symbolValues[i]));
+        }
+
         return new SlotsResult()
         {
-            Payout = 0,
-            Symbols = symbols
+            Payout = payout,
+            SlotSymbols = slotSymbols
         };
     }
 }

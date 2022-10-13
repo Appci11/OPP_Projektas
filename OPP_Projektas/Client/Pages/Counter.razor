@@ -2,6 +2,8 @@
 @using Microsoft.AspNetCore.SignalR.Client
 @using OPP_Projektas.Shared.Models.Enums.Slots
 @using OPP_Projektas.Shared.Models.Slots
+@using OPP_Projektas.Shared.Models.Slots.SlotSymbols
+@using OPP_Projektas.Shared.Models.Slots.SlotSymbols.Rollers
 @inject NavigationManager NavigationManager
 
 <PageTitle>Counter</PageTitle>
@@ -18,43 +20,68 @@
 <p role="status">@Message</p>
 
 <div style="display: flex">
-    <div style="@StyleForSymbol(Results[0])">
-
+    <div style="@Results[0].Render()">
     </div>
-    <div style="@StyleForSymbol(Results[1])">
-
+    <div style="@Results[0].Render()">
     </div>
-    <div style="@StyleForSymbol(Results[2])">
+    <div style="@Results[0].Render()">
     </div>
 </div>
 </div>
 <div style="margin: 50px">
     <h2>REWARDS:</h2>
-        <div style="display:flex;">
+    @if (!IsPictureSymbols)
+    {
+        <div style="display: flex;">
             <div style="background-color: #0000FF; width: 30px; height: 30px; margin: 10px;"></div>
-            <p style="margin-top:12px"> – x5</p>
+            <p style="margin-top: 12px"> – x5</p>
         </div>
-        <div style="display:flex;">
+        <div style="display: flex;">
             <div style="background-color: #FF0000; width: 30px; height: 30px; margin: 10px;"></div>
-            <p style="margin-top:12px"> – x10</p>
+            <p style="margin-top: 12px"> – x10</p>
         </div>
-        <div style="display:flex;">
+        <div style="display: flex;">
             <div style="background-color: #00FF00; width: 30px; height: 30px; margin: 10px;"></div>
-            <p style="margin-top:12px"> – x40</p>
+            <p style="margin-top: 12px"> – x40</p>
         </div>
-        <div style="display:flex;">
+        <div style="display: flex;">
             <div style="background-color: #FFFF00; width: 30px; height: 30px; margin: 10px;"></div>
-            <p style="margin-top:12px"> – x160</p>
+            <p style="margin-top: 12px"> – x160</p>
         </div>
-        <div style="display:flex;">
+        <div style="display: flex;">
             <div style="background-color: #FFA500; width: 30px; height: 30px; margin: 10px;"></div>
-            <p style="margin-top:12px"> – x1000</p>
+            <p style="margin-top: 12px"> – x1000</p>
         </div>
+    }
+    else
+    {
+        <div style="display: flex;">
+            <div style="background-color: #fff; background-image: url('assets/1-first.svg'); width: 30px; height: 30px; margin: 10px;"></div>
+            <p style="margin-top: 12px"> – x5</p>
+        </div>
+        <div style="display: flex;">
+            <div style="background-color: #fff; background-image: url('assets/2-second.svg'); width: 30px; height: 30px; margin: 10px;"></div>
+            <p style="margin-top: 12px"> – x10</p>
+        </div>
+        <div style="display: flex;">
+                <div style="background-color: #fff; background-image: url('assets/3-third.svg'); width: 30px; height: 30px; margin: 10px;"></div>
+            <p style="margin-top: 12px"> – x40</p>
+        </div>
+        <div style="display: flex;">
+                <div style="background-color: #fff; background-image: url('assets/4-fourth.svg'); width: 30px; height: 30px; margin: 10px;"></div>
+            <p style="margin-top: 12px"> – x160</p>
+        </div>
+        <div style="display: flex;">
+                <div style="background-color: #fff; background-image: url('assets/5-fifth.svg'); width: 30px; height: 30px; margin: 10px;"></div>
+            <p style="margin-top: 12px"> – x1000</p>
+        </div>
+    }
 </div>
 </div>
 
 <input @bind="BetSize" type="number" />
 <button class="btn btn-primary" @onclick="Play">Click me</button>
+<button class="btn btn-secondary" @onclick="ChangeSlotType">Switch slot type</button>
 
 <ul style="width: 300px">
     @foreach (var message in Messages)
@@ -69,8 +96,9 @@
     public int BetSize { get; set; } = 1;
     public string Message { get; set; }
     public string Name { get; set; } = "Guest";
+    public bool IsPictureSymbols { get; set; } = false;
     public List<string> Messages { get; set; } = new List<string>();
-    public List<Symbols> Results { get; set; } = new List<Symbols> {Symbols.Orange, Symbols.Orange, Symbols.Orange};
+    public List<ISlotSymbol> Results { get; set; } = new List<ISlotSymbol> {};
 
     protected override async Task OnInitializedAsync()
     {
@@ -78,8 +106,16 @@
             .WithUrl(NavigationManager.ToAbsoluteUri("/slotshub"))
             .Build();
 
-        hubConnection.On<SlotsResult>("SlotResult", async (result) =>
+        SlotRoller roller = new ColorSlotRoller();
+        Results.Add(roller.CreateSymbol(SymbolTier.Fifth));
+        Results.Add(roller.CreateSymbol(SymbolTier.Fifth));
+        Results.Add(roller.CreateSymbol(SymbolTier.Fifth));
+
+        hubConnection.On<SlotsResult>("Something", async (result) =>
         {
+            Console.WriteLine("Test");
+            SlotRoller fakeResultRoller;
+            fakeResultRoller = IsPictureSymbols ? new PictureSlotRoller() : new ColorSlotRoller();
             Random rand = new Random();
             for(int i = 0;i<3;i++){
                 int switchingAmount = 30;
@@ -90,22 +126,22 @@
                 {
                     switch(i){
                         case 0:
-                            Results = new List<Symbols> { (Symbols)rand.Next(0, 5), (Symbols)rand.Next(0, 5), (Symbols)rand.Next(0, 5) };
+                            Results = new List<ISlotSymbol> { fakeResultRoller.CreateSymbol((SymbolTier)rand.Next(0, 5)), fakeResultRoller.CreateSymbol((SymbolTier)rand.Next(0, 5)), fakeResultRoller.CreateSymbol((SymbolTier)rand.Next(0, 5)) };
                             break;
                         case 1:
-                            Results = new List<Symbols> { Results[0], (Symbols)rand.Next(0, 5), (Symbols)rand.Next(0, 5) };
+                            Results = new List<ISlotSymbol> { Results[0], fakeResultRoller.CreateSymbol((SymbolTier)rand.Next(0, 5)), fakeResultRoller.CreateSymbol((SymbolTier)rand.Next(0, 5)) };
                             break;
                         case 2:
-                            Results = new List<Symbols> { Results[0], Results[1], (Symbols)rand.Next(0, 5) };
+                            Results = new List<ISlotSymbol> { Results[0], Results[1], fakeResultRoller.CreateSymbol((SymbolTier)rand.Next(0, 5)) };
                             break;
                     }
                     await Task.Delay(50);
                     await InvokeAsync(StateHasChanged);
                 }
-                Results[i] = result.Symbols[i];
+                Results[i] = result.SlotSymbols[i];
             }
 
-            Results = result.Symbols;
+            Results = result.SlotSymbols;
             Balance += result.Payout;
             if (result.Payout > 150)
             {
@@ -129,6 +165,7 @@
         });
 
         await hubConnection.StartAsync();
+        Console.WriteLine("Connection established");
     }
 
     private async Task Play()
@@ -136,8 +173,14 @@
         if (hubConnection is not null)
         {
             Balance -= BetSize;
-            await hubConnection.SendAsync("Play", Name, BetSize);
+            await hubConnection.SendAsync("Play", Name, BetSize, IsPictureSymbols);
         }
+    }
+
+    private async Task ChangeSlotType()
+    {
+        IsPictureSymbols = !IsPictureSymbols;
+        await InvokeAsync(StateHasChanged);
     }
 
     private string StyleForSymbol(Symbols symbol)

@@ -6,5 +6,5 @@ public enum SymbolTier
     Second,
     Third,
     Fourth,
-    Fifth
+    Fifth,
 }

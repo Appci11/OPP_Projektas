@@ -5,6 +5,14 @@ namespace OPP_Projektas.Shared.Models.Slots.SlotSymbols;
 public class PictureSymbol : ISlotSymbol
 {
     public SymbolTier SymbolTier { get; set; }
+    public PictureSymbol(PictureSymbol obj)
+    {
+        this.SymbolTier = obj.SymbolTier;
+    }
+    public PictureSymbol(SymbolTier tier)
+    {
+        this.SymbolTier = tier;
+    }
 
     public string Render()
     {
@@ -23,5 +31,9 @@ public class PictureSymbol : ISlotSymbol
             default:
                 return "background-color: #FFFFFF; width: 100px; height: 100px; margin: 10px;";
         }
+    }
+    public ISlotSymbol Clone()
+    {
+        return new PictureSymbol(this);
     }
 }

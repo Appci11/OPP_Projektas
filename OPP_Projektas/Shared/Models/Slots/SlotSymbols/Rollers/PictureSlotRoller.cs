@@ -6,6 +6,6 @@ public class PictureSlotRoller : SlotRoller
 {
     public override ISlotSymbol CreateSymbol(SymbolTier symbolTier)
     {
-        return new PictureSymbol() { SymbolTier = symbolTier};
+        return new PictureSymbol(symbolTier);
     }
 }

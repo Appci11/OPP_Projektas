@@ -118,6 +118,7 @@
             Console.WriteLine("Tester2");
             SlotRoller fakeResultRoller;
             fakeResultRoller = IsPictureSymbols ? new PictureSlotRoller() : new ColorSlotRoller();
+            List<ISlotSymbol> resultingSymbols = new List<ISlotSymbol> { fakeResultRoller.CreateSymbol(result.SlotSymbols[0]), fakeResultRoller.CreateSymbol(result.SlotSymbols[1]), fakeResultRoller.CreateSymbol(result.SlotSymbols[2]) };
             Random rand = new Random();
             for(int i = 0;i<3;i++){
                 int switchingAmount = 30;
@@ -140,9 +141,10 @@
                     await Task.Delay(50);
                     await InvokeAsync(StateHasChanged);
                 }
-                Results[i] = fakeResultRoller.CreateSymbol(result.SlotSymbols[i]);
+                //Results[i] = fakeResultRoller.CreateSymbol(result.SlotSymbols[i]);
+                Results[i] = resultingSymbols[i].Clone();
             }
-            
+
             Balance += result.Payout;
             if (result.Payout > 150)
             {
@@ -171,6 +173,7 @@
 
     private async Task Play()
     {
+        Message = "";
         if (hubConnection is not null)
         {
             Balance -= BetSize;

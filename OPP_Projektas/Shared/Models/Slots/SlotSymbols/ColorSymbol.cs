@@ -5,6 +5,14 @@ namespace OPP_Projektas.Shared.Models.Slots.SlotSymbols;
 public class ColorSymbol : ISlotSymbol
 {
     public SymbolTier SymbolTier { get; set; }
+    public ColorSymbol(ColorSymbol obj)
+    {
+        this.SymbolTier = obj.SymbolTier;
+    }
+    public ColorSymbol(SymbolTier tier)
+    {
+        this.SymbolTier = tier;
+    }
     public string Render()
     {
         switch (SymbolTier)
@@ -22,5 +30,9 @@ public class ColorSymbol : ISlotSymbol
             default:
                 return "background-color: #FFFFFF; width: 100px; height: 100px; margin: 10px;";
         }
+    }
+    public ISlotSymbol Clone()
+    {
+        return new ColorSymbol(this);
     }
 }

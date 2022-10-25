@@ -57,7 +57,7 @@ public class Slots
             payout = betAmount * payouts[SymbolTier.Second];
             symbolValues = new List<SymbolTier> { SymbolTier.Second, SymbolTier.Second, SymbolTier.Second };
         }
-        if (number == 800)
+        if (number >= 800)
         {
             payout = betAmount * payouts[SymbolTier.First];
             symbolValues = new List<SymbolTier> {SymbolTier.First, SymbolTier.First, SymbolTier.First};

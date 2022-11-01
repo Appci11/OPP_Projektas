@@ -7,12 +7,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+
+//-----for signalR is MSofto, nieko custom
 builder.Services.AddSignalR();
-builder.Services.AddResponseCompression(opts =>
-{
-    opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
-        new[] { "application/octet-stream" });
-});
+builder.Services.AddResponseCompression(options =>
+    options.MimeTypes = ResponseCompressionDefaults
+    .MimeTypes
+    .Concat(new[] { "application/octet-stream" })
+);
+//-----
 
 var app = builder.Build();
 
@@ -41,6 +44,8 @@ app.MapRazorPages();
 app.MapControllers();
 app.MapFallbackToFile("index.html");
 
+//hub'u endpoint'ai
 app.MapHub<SlotsHub>("/slotshub");
+app.MapHub<RouletteHub>("/roulettehub");
 
 app.Run();

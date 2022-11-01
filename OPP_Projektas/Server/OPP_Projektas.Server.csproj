@@ -17,7 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="GameHubs\" />
     <Folder Include="Models\BlackJack\" />
     <Folder Include="Models\Slots\" />
   </ItemGroup>

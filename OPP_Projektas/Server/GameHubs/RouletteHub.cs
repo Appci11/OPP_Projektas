@@ -12,19 +12,17 @@ namespace OPP_Projektas.Server.GameHubs
         private static Dictionary<string, string> Users = new Dictionary<string, string>();
 
         static bool TableHasPlayers = false;
-        int PlaceBetsTimer = 10;
+        static int betsCount = 0;
 
         public override async Task OnConnectedAsync()
         {
             string username = Context.GetHttpContext().Request.Query["username"];
             Users.Add(Context.ConnectionId, username);
             //await AddConnectionStatusMsg(string.Empty, "User connected!");
+            
             await AddConnectionStatusMsg($"{username} joined the game!");
-            if (!TableHasPlayers)
-            {
-                TableHasPlayers = true;
-                await RunPlaceBetsTimer();
-            }
+            await Clients.All.SendAsync("GetPlayerCount", Users.Count);
+            await Clients.All.SendAsync("GetBetsPlacedCount", betsCount);
 
             //needed by default, ne mano ismislas
             await base.OnConnectedAsync();
@@ -35,31 +33,37 @@ namespace OPP_Projektas.Server.GameHubs
             string username = Users.FirstOrDefault(u => u.Key == Context.ConnectionId).Value;
             await AddConnectionStatusMsg($"{username} left the game!");
             Users.Remove(Context.ConnectionId);
+            await Clients.All.SendAsync("GetPlayerCount", Users.Count);
             if (Users.Count < 1) TableHasPlayers = false;
         }
 
         public async Task AddConnectionStatusMsg(string message)
         {
-            await Clients.All.SendAsync("GetThatMessage", message);
+            await Clients.All.SendAsync("GetMessage", message);
         }
 
-        public async Task RunPlaceBetsTimer()
+        public async Task SendPlayerCount()
         {
-            while (TableHasPlayers)
+            await Clients.All.SendAsync("GetPlayerCount", Users.Count);
+        }
+
+        public async Task PlaceABet()
+        {
+            await Clients.All.SendAsync("GetBetsPlacedCount", ++betsCount);
+            if(betsCount >= Users.Count)
             {
-                while (PlaceBetsTimer > 0)
-                {
-                    await SendPlaceBetsTime(PlaceBetsTimer);
-                    PlaceBetsTimer--;
-                    Thread.Sleep(1000);
-                }
-                PlaceBetsTimer = 10;
+                await RollANumber();
             }
         }
 
-        public async Task SendPlaceBetsTime(int time)
+        public async Task RollANumber()
         {
-            await Clients.All.SendAsync("GetPlaceBetsTime", time);
+            Random rand = new Random();
+            int number = rand.Next(0, 36);
+            await Clients.All.SendAsync("GetRolledNumber", ++number);
+            betsCount = 0;
+            await Clients.All.SendAsync("GetBetsPlacedCount", betsCount);
+            await Clients.All.SendAsync("GetMessage", $"Rolled #{number}");
         }
     }
 }

@@ -22,8 +22,18 @@ PS. "@using blablabla"" galima i _Imports.razor det, tuomet visiem puslapiam gal
 }
 else
 {
-    <p>Place your bets : @betsTimer</p>
+    <p>Number of players: @playerCount</p>
+    <p>Number of bets placed: @betsPlacedCound</p>
     <br />
+    if (rolledNumber > -1)
+    {
+        <h3>Rolled number: @rolledNumber</h3>
+    }
+    <br />
+    if (!betPlaced)
+    {
+        <button class="btn btn-primary" @onclick="PlaceABet">Place a bet</button>
+    }
     <ul id="messagesList">
         @foreach (var message in messages)
         {
@@ -37,8 +47,11 @@ else
     public bool IsConnected => hubConnection?.State == HubConnectionState.Connected;
 
     private string username = string.Empty;
-    private int betsTimer = 0;
-
+    private int playerCount = 0;
+    private int betsPlacedCound = 0;
+    private int rolledNumber = -1;
+    private bool betPlaced = false;
+    private string betButtonState = "";
     private List<string> messages = new List<string>();
 
     private async Task Connect()
@@ -50,7 +63,7 @@ else
             .WithUrl(NavigationManager.ToAbsoluteUri($"/roulettehub?username={username}"))
             .Build();
 
-        hubConnection.On<string>("GetThatMessage", (user) =>
+        hubConnection.On<string>("GetMessage", (user) =>
         {
             var msg = user;
             if (messages.Count < 5)
@@ -66,15 +79,37 @@ else
             StateHasChanged();
         });
 
-        hubConnection.On<int>("GetPlaceBetsTime", (time) =>
+        hubConnection.On<int>("GetPlayerCount", (count) =>
         {
-            betsTimer = time;
+            playerCount = count;
+            StateHasChanged();
+        });
+
+        hubConnection.On<int>("GetBetsPlacedCount", (count) =>
+        {
+            betsPlacedCound = count;
+            StateHasChanged();
+        });
+
+        hubConnection.On<int>("GetRolledNumber", (number) =>
+        {
+            rolledNumber = number;
+            betPlaced = false;
             StateHasChanged();
         });
 
 
         //by default reikia, ne savo isgalvota
         await hubConnection.StartAsync();
+    }
+
+    private async Task PlaceABet()
+    {
+        if (hubConnection != null)
+        {
+            await hubConnection.SendAsync("PlaceABet");
+            betPlaced = true;
+        }
     }
 
     //copy pasta default dispose...

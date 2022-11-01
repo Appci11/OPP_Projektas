@@ -11,5 +11,4 @@ public class BlackJackHub : Hub
         await Clients.All.SendAsync("NewPlayerJoined", player);
         //TODO TableService.AddPlayer(player, tableId)
     }
-
 }

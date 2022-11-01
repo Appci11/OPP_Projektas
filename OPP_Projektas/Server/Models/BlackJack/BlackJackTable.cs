@@ -1,13 +1,11 @@
 ﻿using OPP_Projektas.Server.GameHubs;
 using OPP_Projektas.Shared.Models.BlackJack;
 using OPP_Projektas.Shared.Models.Enums;
-using System;
 using Microsoft.AspNetCore.SignalR;
-using System.Numerics;
 
 namespace OPP_Projektas.Server.Models.BlackJack;
 
-public class BlackJackTable
+public class BlackJackTable : Hub
 {
     public int MinBet { get; set; }
     public int MaxBet { get; set; }
@@ -22,7 +20,19 @@ public class BlackJackTable
     public BlackJackTable(IHubContext<BlackJackHub> hub)
     {
         _hub = hub;
-        Deck = new BlackJackDeck(8);
+
+        var builder = new BlackJackSetBuilder();
+        for (var i = 0; i < 8; i++)
+        {
+            builder.AddAces();
+            builder.AddKings();
+            builder.AddQueens();
+            builder.AddJacks();
+            builder.AddNumbers();
+        }
+
+        Deck = builder.GetBlackJackDeck();
+        BlackJackDeck.Shuffle(Deck.Cards);
     }
 
     public async void Play()

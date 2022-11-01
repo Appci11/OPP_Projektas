@@ -1,7 +1,57 @@
 ﻿@page "/blackjack"
+@using Microsoft.AspNetCore.SignalR.Client
+@using OPP_Projektas.Shared.Models.BlackJack
+@inject NavigationManager NavigationManager
 
-<h3>BlackJack</h3>
+<PageTitle>BlackJack</PageTitle>
+<div style="display:flex">
+    <div>
+        <h1>BlackJack</h1>
+    </div>
+</div>
 
+<button class="btn btn-primary" hidden="@_hideJoinButton" @onclick="JoinTable">Join table</button>
+<button class="btn btn-primary" hidden="@_hideStartGameBtn" @onclick="StartGame">Start game</button>
 @code {
+    private HubConnection? _hubConnection;
+    private Guid _tableId = Guid.NewGuid();
+    private Guid _playerId = Guid.NewGuid();
+    private bool _hideJoinButton;
+    private bool _hideStartGameBtn = true;
 
+    public BlackJackPlayer BlackJackPlayer { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/blackjackhub"))
+            .WithAutomaticReconnect()
+            .Build();
+
+        _hubConnection.On<BlackJackPlayer>("NewPlayerJoined", NewPlayerJoined);
+        
+        await _hubConnection.StartAsync();
+        Console.WriteLine("Connection established");
+    }
+
+    private async Task JoinTable()
+    {
+        if (_hubConnection is not null)
+        {
+            await _hubConnection.SendAsync("PlayerJoined", _playerId, _tableId);
+            _hideJoinButton = true;
+        }
+    }
+
+    private void NewPlayerJoined(BlackJackPlayer player)
+    {
+        Console.WriteLine($"New player joined {player.Id} with balance {player.Balance}");
+        BlackJackPlayer = player;
+        _hideStartGameBtn = false;
+    }
+
+    private void StartGame()
+    {
+        throw new NotImplementedException();
+    }
 }

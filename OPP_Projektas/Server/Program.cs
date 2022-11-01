@@ -42,5 +42,6 @@ app.MapControllers();
 app.MapFallbackToFile("index.html");
 
 app.MapHub<SlotsHub>("/slotshub");
+app.MapHub<BlackJackHub>("/blackjackhub");
 
 app.Run();

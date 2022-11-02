@@ -33,7 +33,6 @@ public class ColorSymbol : ISlotSymbol
     }
     public ISlotSymbol ShallowClone()
     {
-        //return (ColorSymbol)this.MemberwiseClone();
         var original = this;
         return original;
     }

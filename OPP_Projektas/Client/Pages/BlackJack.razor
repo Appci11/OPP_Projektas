@@ -1,37 +1,148 @@
 ﻿@page "/blackjack"
 @using Microsoft.AspNetCore.SignalR.Client
 @using OPP_Projektas.Shared.Models.BlackJack
+@using OPP_Projektas.Shared.Models.Styles
 @inject NavigationManager NavigationManager
 
 <PageTitle>BlackJack</PageTitle>
 <div style="display:flex">
     <div>
         <h1>BlackJack</h1>
+
+        <div>
+            <p role="status">Balance: @BlackJackPlayer.Balance</p>
+            <p role="status">@Message</p>
+        </div>
+
+        <table hidden="@_hideTable">
+            <tr>
+                @foreach (var card in DealerCards)
+                {
+                    <td style="@CardsStyle.RenderCardBorder()">@card.Suit.ToString() | @card.FaceValue.ToString()</td>
+                }
+                <td>@DealerCards.Sum(c => c.ScoreValue)</td>
+            </tr>
+            <tr>
+                @foreach (var card in BlackJackPlayer.Cards)
+                {
+                    <td style="@CardsStyle.RenderCardBorder()">@card.Suit.ToString() | @card.FaceValue.ToString()</td>
+                }
+                <td>@BlackJackPlayer.Cards.Sum(c => c.ScoreValue)</td>
+            </tr>
+        </table>
     </div>
 </div>
 
 <button class="btn btn-primary" hidden="@_hideJoinButton" @onclick="JoinTable">Join table</button>
-<button class="btn btn-primary" hidden="@_hideStartGameBtn" @onclick="StartGame">Start game</button>
+<div hidden="@_hideStartGameBtn">
+    <input @bind="BetSize" type="number" aria-label="Bet size:"/>
+    <button class="btn btn-primary" @onclick="StartGame">Start game</button>
+</div>
+<div hidden="@_hidePlayButtons">
+    <button disabled="@_loading" class="btn btn-primary" @onclick="DrawCard">Hit me!</button>
+    <button disabled="@_loading" class="btn btn-secondary" @onclick="DealerDrawCard">Pass</button>
+</div>
+<hr/>
+<button class="btn btn-info" @onclick="ChangeCardsStyle">Changed slots style</button>
+
 @code {
+    private IStyle _style = new DefaultStyle();
     private HubConnection? _hubConnection;
     private Guid _tableId = Guid.NewGuid();
     private Guid _playerId = Guid.NewGuid();
     private bool _hideJoinButton;
     private bool _hideStartGameBtn = true;
+    private bool _hidePlayButtons = true;
+    private bool _loading;
+    private string StartBtnLabel = "Start game";
+    private bool _initialPhaseDone = false;
+    private bool _hideTable;
 
-    public BlackJackPlayer BlackJackPlayer { get; set; }
+    public BlackJackPlayer BlackJackPlayer { get; set; } = new();
+    public List<BlackJackCard> DealerCards { get; set; }
+    public string Message { get; set; }
+    public int BetSize { get; set; } = 1;
+    public ICardStyle CardsStyle { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
+        CardsStyle = _style.CreateCardsStyle();
+        DealerCards = new List<BlackJackCard>();
         _hubConnection = new HubConnectionBuilder()
             .WithUrl(NavigationManager.ToAbsoluteUri("/blackjackhub"))
             .WithAutomaticReconnect()
             .Build();
 
         _hubConnection.On<BlackJackPlayer>("NewPlayerJoined", NewPlayerJoined);
+        _hubConnection.On("BettingPhaseDone", () =>
+        {
+            Message = "Betting done!";
+            BlackJackPlayer.Balance -= BetSize;
+        });
+        _hubConnection.On("InitialDealPhase", () => Message = "Dealing cards..");
+        _hubConnection.On("InitialDealPhaseOver", async () =>
+        {
+            Message = "Initial dealing phase is over";
+            _hidePlayButtons = false;
+            _initialPhaseDone = true;
+            await InvokeAsync(StateHasChanged);
+        });
+        _hubConnection.On<string, BlackJackCard?>("CardDealt", async (playerId, card) =>
+        {
+            if (card is null)
+                return;
+
+            if (playerId.Equals("Dealer"))
+            {
+                DealerCards.Add(card);
+                Message = "";
+            }
+            else
+            {
+                BlackJackPlayer.Cards.Add(card);
+                Message = "";
+                if (_initialPhaseDone && !_hidePlayButtons)
+                {
+                    await _hubConnection.SendAsync("DrawCard", "Dealer");
+                    Message = "Dealer drawing card";
+                }
+            }
+            CheckWinner(DealerCards.Sum(c => c.ScoreValue), "House");
+            CheckWinner(BlackJackPlayer.Cards.Sum(c => c.ScoreValue), "You");
+            
+            await InvokeAsync(StateHasChanged);
+        });
+
+        _hubConnection.On<BlackJackPlayer>("BettingPhaseDone", player =>
+        {
+            BlackJackPlayer = player;
+            Message = "Betting finished. Dealer drawing cards";
+        });
         
         await _hubConnection.StartAsync();
         Console.WriteLine("Connection established");
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void CheckWinner(int score, string player)
+    {
+        switch (score)
+        {
+            case 21:
+                _hidePlayButtons = true;
+                Message = $"BLACKJACK! {player} wins!";
+                break;
+            case > 21:
+                _hidePlayButtons = true;
+                Message = $"{player} lost";
+                StartBtnLabel = "Restart game";
+                _hideStartGameBtn = false;
+                break;
+            case < 21:
+                _loading = false;
+                break;
+        }
     }
 
     private async Task JoinTable()
@@ -43,15 +154,76 @@
         }
     }
 
-    private void NewPlayerJoined(BlackJackPlayer player)
+    private async Task NewPlayerJoined(BlackJackPlayer player)
     {
         Console.WriteLine($"New player joined {player.Id} with balance {player.Balance}");
         BlackJackPlayer = player;
         _hideStartGameBtn = false;
+
+        await InvokeAsync(StateHasChanged);
     }
 
-    private void StartGame()
+    private async Task StartGame()
     {
-        throw new NotImplementedException();
+        Reset();
+        if (_hubConnection is not null)
+        {
+            BlackJackPlayer.Bet = BetSize;
+
+            await _hubConnection.SendAsync("Play", BlackJackPlayer);
+            _hideStartGameBtn = true;
+            _hideTable = false;
+            
+            await InvokeAsync(StateHasChanged);
+        }
     }
-}
+
+    private async Task ChangeCardsStyle()
+    {
+        if (typeof(DefaultStyle) == _style.GetType())
+        {
+            _style = new RedStyle();
+            CardsStyle = _style.CreateCardsStyle();
+        }
+        else if (typeof(RedStyle) == _style.GetType())
+        {
+            _style = new BlueStyle();
+            CardsStyle = _style.CreateCardsStyle();
+        }
+        else if (typeof(BlueStyle) == _style.GetType())
+        {
+            _style = new DefaultStyle();
+            CardsStyle = _style.CreateCardsStyle();
+        }
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task DrawCard()
+    {
+        if (_hubConnection != null)
+        {
+            await _hubConnection.SendAsync("DrawCard", BlackJackPlayer.Id.ToString());
+            Message = "Drawing card..";
+            _loading = true;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task DealerDrawCard()
+    {
+        if (_hubConnection != null)
+        {
+            await _hubConnection.SendAsync("DrawCard", "Dealer");
+            Message = "Dealer drawing card..";
+            _loading = true;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void Reset()
+    {
+        DealerCards = new List<BlackJackCard>();
+        BlackJackPlayer.Cards = new List<BlackJackCard>();
+    }
+    
+    } 

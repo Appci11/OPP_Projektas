@@ -48,5 +48,6 @@ app.MapFallbackToFile("index.html");
 app.MapHub<SlotsHub>("/slotshub");
 app.MapHub<SlotsHub>("/blackjackhub");
 app.MapHub<RouletteHub>("/roulettehub");
+app.MapHub<ChatHub>("/chathub");
 
 app.Run();

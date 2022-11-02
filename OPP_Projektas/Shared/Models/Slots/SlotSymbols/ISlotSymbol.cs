@@ -6,8 +6,12 @@ public interface ISlotSymbol
 {
     public SymbolTier SymbolTier { get; set; }
     public string Render();
-    public ISlotSymbol Clone()
+    public ISlotSymbol ShallowClone()
     {
-        return this.Clone();
+        return this.ShallowClone();
+    }
+    public ISlotSymbol DeepClone()
+    {
+        return this.DeepClone();
     }
 }

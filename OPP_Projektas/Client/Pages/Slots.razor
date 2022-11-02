@@ -151,8 +151,7 @@
                     await Task.Delay(50);
                     await InvokeAsync(StateHasChanged);
                 }
-                //Results[i] = fakeResultRoller.CreateSymbol(result.SlotSymbols[i]);
-                Results[i] = resultingSymbols[i].Clone();
+                Results[i] = fakeResultRoller.CreateSymbol(result.SlotSymbols[i]);
             }
 
             Balance += result.Payout;

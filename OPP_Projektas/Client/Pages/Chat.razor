@@ -8,7 +8,7 @@
 @if (!IsConnected)
 {
     <div class="input-group">
-        <input @bind="username" class="form-control" placeholder="What's your name?">w
+        <input @bind="username" class="form-control" placeholder="What's your name?">
         <button class="btn btn-primary form-control-append" @onclick="Connect">
             Connect
         </button>
@@ -18,7 +18,7 @@ else
 {
     <textarea style="width : 100%; height: 500px; " @ref="TextAreaRef">
         @messages
-                </textarea>
+    </textarea>
     <div class="input-group">
         <input @bind-value="message"
            @bind-value:event="oninput"
@@ -48,10 +48,13 @@ else
 
             .Build();
 
-        hubConnection.On<string, string>("GetThatMessageDude", (user, message) =>
+        hubConnection.On<List<Message>>("ReceiveMessages", (Msgs) =>
         {
-            var msg = $"{(string.IsNullOrEmpty(user) ? "" : user + ": ")}{message}";
-            messages += msg + "\n";
+            messages = string.Empty;
+            foreach(Message msg in Msgs)
+            {
+                messages += $"{msg.Username}: {msg.Msg} \n";
+            }
             //sad
             JSRuntime.InvokeVoidAsync("scrollToBottom", TextAreaRef);
             StateHasChanged();

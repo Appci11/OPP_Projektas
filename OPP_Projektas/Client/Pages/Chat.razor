@@ -30,6 +30,8 @@ else
             Send
         </button>
     </div>
+    <button class="btn btn-secondary" @onclick="Undo"disabled="@(!IsConnected)">Undo</button>
+    <button class="btn btn-secondary" @onclick="Redo"disabled="@(!IsConnected)">Redo</button>
 }
 
 @code {
@@ -70,6 +72,22 @@ else
             //siuncia signala i signalR hub
             await hubConnection.SendAsync("AddMessageToChat", username, message);
             message = string.Empty;
+        }
+    }
+
+    private async Task Undo()
+    {
+        if (hubConnection != null)
+        {
+            await hubConnection.SendAsync("UndoAction");
+        }
+    }
+
+    private async Task Redo()
+    {
+        if (hubConnection != null)
+        {
+            await hubConnection.SendAsync("RedoAction");
         }
     }
 

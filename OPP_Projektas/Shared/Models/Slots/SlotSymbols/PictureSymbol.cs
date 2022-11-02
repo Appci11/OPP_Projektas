@@ -32,7 +32,12 @@ public class PictureSymbol : ISlotSymbol
                 return "background-color: #FFFFFF; width: 100px; height: 100px; margin: 10px;";
         }
     }
-    public ISlotSymbol Clone()
+    public ISlotSymbol ShallowClone()
+    {
+        var shallowCopy = this;
+        return shallowCopy;
+    }
+    public ISlotSymbol DeepClone()
     {
         return new PictureSymbol(this);
     }

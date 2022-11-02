@@ -1,10 +1,11 @@
 ﻿@*
 Padariau atskira directory, nes planuoja but bent keli komponentai...
 jei viskas i viena kruva eis... nu patys suprantam
-PS. "@using blablabla"" galima i _Imports.razor det, tuomet visiem puslapiam galios
+PS. "@using blablabla" galima i _Imports.razor det, tuomet visiem puslapiam galios
 *@
 
 @page "/roulette"
+@inject ILocalStorageService LocalStorage
 @inject NavigationManager NavigationManager
 @implements IAsyncDisposable
 
@@ -51,8 +52,10 @@ else
     private int betsPlacedCound = 0;
     private int rolledNumber = -1;
     private bool betPlaced = false;
-    private string betButtonState = "";
     private List<string> messages = new List<string>();
+
+    //await LocalStorage.SetItemAsync("token", token);
+    //await LocalStorage.RemoveItemAsync("token");
 
     private async Task Connect()
     {

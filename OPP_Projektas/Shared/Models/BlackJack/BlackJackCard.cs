@@ -1,24 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using OPP_Projektas.Shared.Models.Cards;
 using OPP_Projektas.Shared.Models.Enums.Cards;
 
 namespace OPP_Projektas.Shared.Models.BlackJack
 {
-    public class BlackJackCard
+    public class BlackJackCard : Card
     {
-        public Suit Suit { get; set; }
-        public Value FaceValue { get; set; }
         public int ScoreValue { get; set; }
         public bool IsReduced { get; set; }
 
-        public BlackJackCard(Suit suit, Value faceValue)
+        public BlackJackCard(Suit suit, Value faceValue) : base(suit, faceValue)
         {
-            Suit = suit;
-            FaceValue = faceValue;
             ScoreValue = GetScoreValue(FaceValue);
             IsReduced = false;
         }

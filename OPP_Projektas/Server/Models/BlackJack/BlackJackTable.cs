@@ -1,9 +1,9 @@
-﻿using OPP_Projektas.Server.GameHubs;
+﻿using Microsoft.AspNetCore.Http.Connections;
+using Microsoft.AspNetCore.Http.Connections.Client;
+using OPP_Projektas.Server.GameHubs;
 using OPP_Projektas.Shared.Models.BlackJack;
 using OPP_Projektas.Shared.Models.Enums;
-using System;
 using Microsoft.AspNetCore.SignalR;
-using System.Numerics;
 
 namespace OPP_Projektas.Server.Models.BlackJack;
 
@@ -18,14 +18,41 @@ public class BlackJackTable
     public List<BlackJackCard> DealerCards { get; set; }
 
     private readonly IHubContext<BlackJackHub> _hub;
+    public IHubCallerClients Clients { get; set; }
 
     public BlackJackTable(IHubContext<BlackJackHub> hub)
     {
         _hub = hub;
-        Deck = new BlackJackDeck(8);
+        BuildBlackJackSet();
     }
 
-    public async void Play()
+    public BlackJackTable()
+    {
+        Players = new List<BlackJackPlayer>();
+        DealerCards = new List<BlackJackCard>();
+        MinBet = 1;
+        MaxBet = 100;
+
+        BuildBlackJackSet();
+    }
+    
+    private void BuildBlackJackSet()
+    {
+        var builder = new BlackJackSetBuilder();
+        for (var i = 0; i < 8; i++)
+        {
+            builder.AddAces();
+            builder.AddKings();
+            builder.AddQueens();
+            builder.AddJacks();
+            builder.AddNumbers();
+        }
+
+        Deck = builder.GetBlackJackDeck();
+        BlackJackDeck.Shuffle(Deck.Cards);
+    }
+
+    public async Task Play()
     {
         await BettingPhase();
         await InitialDealPhase();
@@ -33,46 +60,64 @@ public class BlackJackTable
 
     public async Task BettingPhase()
     {
+        BlackJackGameState = BlackJackGameState.Betting;
         if (IsGameStopped())
         {
             return;
         }
 
-        await _hub.Clients.All.SendAsync("BettingPhase");
-        await Task.Delay(30000);
-        await _hub.Clients.All.SendAsync("BettingPhaseDone");
+        foreach (var player in Players)
+        {
+            player.Balance -= player.Bet;
+        }
+
+        // await _hub.Clients.All.SendAsync("BettingPhase");
+        // await Task.Delay(30000);
+        // await _hub.Clients.All.SendAsync("BettingPhaseDone");
+        await Clients.All.SendAsync("BettingPhaseDone", Players[0]);
     }
 
     public async Task InitialDealPhase()
     {
-        await _hub.Clients.All.SendAsync("InitialDealPhase");
+        BlackJackGameState = BlackJackGameState.DealerPhase;
+        
+        // await _hub.Clients.All.SendAsync("InitialDealPhase");
+        await Clients.All.SendAsync("InitialDealPhase");
         foreach (var player in Players)
         {
             var card = Deck.Draw();
             player.Cards.Add(card);
-            await _hub.Clients.All.SendAsync("CardDealt", player.Id.ToString(), card);
+            // await _hub.Clients.All.SendAsync("CardDealt", player.Id.ToString(), card);
+            await Task.Delay(1000);
+            await Clients.All.SendAsync("CardDealt", player.Id.ToString(), card);
         }
 
         var dealerCard = Deck.Draw();
         DealerCards.Add(dealerCard);
-        await _hub.Clients.All.SendAsync("CardDealt", "Dealer", Deck.Draw());
+        // await _hub.Clients.All.SendAsync("CardDealt", "Dealer", Deck.Draw());
+        await Task.Delay(1000);
+        await Clients.All.SendAsync("CardDealt", "Dealer", Deck.Draw());
 
         foreach (var player in Players)
         {
             var card = Deck.Draw();
             player.Cards.Add(card);
-            await _hub.Clients.All.SendAsync("CardDealt", player.Id.ToString(), card);
+            // await _hub.Clients.All.SendAsync("CardDealt", player.Id.ToString(), card);
+            await Task.Delay(1000);
+            await Clients.All.SendAsync("CardDealt", player.Id.ToString(), card);
         }
 
         dealerCard = Deck.Draw();
         DealerCards.Add(dealerCard);
-        await _hub.Clients.All.SendAsync("CardDealt", "Dealer", Deck.Draw());
-        await _hub.Clients.All.SendAsync("InitialDealPhaseOver");
+        await Task.Delay(1000);
+        // await _hub.Clients.All.SendAsync("CardDealt", "Dealer", Deck.Draw());
+        // await _hub.Clients.All.SendAsync("InitialDealPhaseOver");
+        await Clients.All.SendAsync("CardDealt", "Dealer", Deck.Draw());
+        await Clients.All.SendAsync("InitialDealPhaseOver");
     }
 
     private bool IsGameStopped()
     {
         return BlackJackGameState == BlackJackGameState.Stopped;
     }
-
 }

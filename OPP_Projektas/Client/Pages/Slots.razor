@@ -4,6 +4,7 @@
 @using OPP_Projektas.Shared.Models.Slots
 @using OPP_Projektas.Shared.Models.Slots.SlotSymbols
 @using OPP_Projektas.Shared.Models.Slots.SlotSymbols.Rollers
+@using OPP_Projektas.Shared.Models.Styles
 @inject NavigationManager NavigationManager
 
 <PageTitle>Slots</PageTitle>
@@ -20,12 +21,16 @@
 <p role="status">@Message</p>
 
 <div style="display: flex">
-    <div style="@Results[0].Render()">
-    </div>
-    <div style="@Results[1].Render()">
-    </div>
-    <div style="@Results[2].Render()">
-    </div>
+    <table style="@SlotsMachineStyle.RenderBorder()">
+        <tr>
+            <td style="@SlotsMachineStyle.RenderBorder()">
+                <div style="@Results[0].Render()"></div></td>
+            <td style="@SlotsMachineStyle.RenderBorder()">
+                <div style="@Results[1].Render()"></div></td>
+            <td style="@SlotsMachineStyle.RenderBorder()">
+                <div style="@Results[2].Render()"></div></td>
+        </tr>
+    </table>
 </div>
 </div>
 <div style="margin: 50px">
@@ -82,6 +87,7 @@
 <input @bind="BetSize" type="number" />
 <button class="btn btn-primary" @onclick="Play">Click me</button>
 <button class="btn btn-secondary" @onclick="ChangeSlotType">Switch slot type</button>
+<button class="btn btn-info" @onclick="ChangeSlotsStyle">Changed slots style</button>
 
 <ul style="width: 300px">
     @foreach (var message in Messages)
@@ -92,6 +98,7 @@
 @code {
     private HubConnection? hubConnection;
     private int Balance = 500;
+    private IStyle _style = new DefaultStyle();
 
     public int BetSize { get; set; } = 1;
     public string Message { get; set; }
@@ -99,9 +106,12 @@
     public bool IsPictureSymbols { get; set; } = false;
     public List<string> Messages { get; set; } = new List<string>();
     public List<ISlotSymbol> Results { get; set; } = new List<ISlotSymbol> {};
+    public ISlotsMachineStyle SlotsMachineStyle { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
+        SlotsMachineStyle = _style.CreateSlotsMachineStyle();
+        
         SlotRoller roller = new ColorSlotRoller();
         Results.Add(roller.CreateSymbol(SymbolTier.Fifth));
         Results.Add(roller.CreateSymbol(SymbolTier.Fifth));
@@ -157,7 +167,7 @@
             {
                 Message = $"WINNNEEEERRRR +{result.Payout}";
             }
-            InvokeAsync(StateHasChanged);
+            await InvokeAsync(StateHasChanged);
         });
 
         hubConnection.On<string>("WinBroadcasted", (result) =>
@@ -204,4 +214,25 @@
                 return "background-color: #FFFFFF; width: 100px; height: 100px; margin: 10px;";
         }
     }
+
+    private async Task ChangeSlotsStyle()
+    {
+        if (typeof(DefaultStyle) == _style.GetType())
+        {
+            _style = new RedStyle();
+            SlotsMachineStyle = _style.CreateSlotsMachineStyle();
+        }
+        else if (typeof(RedStyle) == _style.GetType())
+        {
+            _style = new BlueStyle();
+            SlotsMachineStyle = _style.CreateSlotsMachineStyle();
+        }
+        else if (typeof(BlueStyle) == _style.GetType())
+        {
+            _style = new DefaultStyle();
+            SlotsMachineStyle = _style.CreateSlotsMachineStyle();
+        }
+        await InvokeAsync(StateHasChanged);
+    }
+
 }

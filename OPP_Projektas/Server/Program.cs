@@ -46,7 +46,7 @@ app.MapFallbackToFile("index.html");
 
 //hub'u endpoint'ai
 app.MapHub<SlotsHub>("/slotshub");
-app.MapHub<SlotsHub>("/blackjackhub");
+app.MapHub<BlackJackHub>("/blackjackhub");
 app.MapHub<RouletteHub>("/roulettehub");
 app.MapHub<ChatHub>("/chathub");
 

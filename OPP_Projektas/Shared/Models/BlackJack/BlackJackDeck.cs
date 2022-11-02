@@ -1,27 +1,19 @@
-﻿using OPP_Projektas.Shared.Models.Enums.Cards;
-
-namespace OPP_Projektas.Shared.Models.BlackJack;
+﻿namespace OPP_Projektas.Shared.Models.BlackJack;
 
 public class BlackJackDeck
 {
     public List<BlackJackCard> Cards { get; set; }
-
-    public BlackJackDeck(int decksInPlay)
+    
+    public BlackJackDeck()
     {
         Cards = new List<BlackJackCard>();
-        for (int i = 0; i < decksInPlay; i++)
-        {
-            foreach (var suit in (Suit[]) Enum.GetValues(typeof(Suit)))
-            {
-                foreach (var faceValue in (Value[])Enum.GetValues(typeof(Value)))
-                {
-                    Cards.Add(new BlackJackCard(suit, faceValue));
-                }
-            }
-        }
-        Shuffle(Cards);
     }
 
+    public void Add(BlackJackCard card)
+    {
+        Cards.Add(card);
+    }
+    
     public BlackJackCard Draw()
     {
         var card = Cards.First();

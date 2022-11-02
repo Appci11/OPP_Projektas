@@ -40,7 +40,7 @@
 </div>
 <div hidden="@_hidePlayButtons">
     <button disabled="@_loading" class="btn btn-primary" @onclick="DrawCard">Hit me!</button>
-    <button disabled="@_loading" class="btn btn-secondary" @onclick="DealerDrawCard">Pass</button>
+    <button disabled="@_loading" class="btn btn-secondary" @onclick="PlayerStands">Stand</button>
 </div>
 <hr/>
 <button class="btn btn-info" @onclick="ChangeCardsStyle">Changed slots style</button>
@@ -55,8 +55,9 @@
     private bool _hidePlayButtons = true;
     private bool _loading;
     private string StartBtnLabel = "Start game";
-    private bool _initialPhaseDone = false;
+    private bool _initialPhaseDone;
     private bool _hideTable;
+    private bool _playerStands;
 
     public BlackJackPlayer BlackJackPlayer { get; set; } = new();
     public List<BlackJackCard> DealerCards { get; set; }
@@ -107,9 +108,7 @@
                     Message = "Dealer drawing card";
                 }
             }
-            CheckWinner(DealerCards.Sum(c => c.ScoreValue), "House");
-            CheckWinner(BlackJackPlayer.Cards.Sum(c => c.ScoreValue), "You");
-            
+            CheckWinner(DealerCards.Sum(c => c.ScoreValue), BlackJackPlayer.Cards.Sum(c => c.ScoreValue));
             await InvokeAsync(StateHasChanged);
         });
 
@@ -125,24 +124,62 @@
         await InvokeAsync(StateHasChanged);
     }
 
-    private void CheckWinner(int score, string player)
+    private void CheckWinner(int dealerScore, int playerScore)
     {
-        switch (score)
+        switch (dealerScore)
         {
             case 21:
                 _hidePlayButtons = true;
-                Message = $"BLACKJACK! {player} wins!";
+                Message = "BLACKJACK! House wins!";
+                SetupRestartButton();
                 break;
             case > 21:
                 _hidePlayButtons = true;
-                Message = $"{player} lost";
-                StartBtnLabel = "Restart game";
-                _hideStartGameBtn = false;
+                Message = "You won";
+                SetupRestartButton();
                 break;
             case < 21:
                 _loading = false;
                 break;
         }
+        switch (playerScore)
+        {
+            case 21:
+                _hidePlayButtons = true;
+                Message = "BLACKJACK! You win!";
+                SetupRestartButton();
+                break;
+            case > 21:
+                _hidePlayButtons = true;
+                Message = "House wins";
+                SetupRestartButton();
+                break;
+            case < 21:
+                _loading = false;
+                break;
+        }
+        if (!_playerStands) return;
+        if (dealerScore > playerScore)
+        {
+            Message = "House wins";
+            SetupRestartButton();
+        }
+        else if (dealerScore < playerScore)
+        {
+            Message = "Player wins";
+            SetupRestartButton();
+        }
+        else
+        {
+            Message = "Draw!";
+            SetupRestartButton();
+        }
+    }
+
+    private void SetupRestartButton()
+    {
+        StartBtnLabel = "Restart game";
+        _hideStartGameBtn = false;
     }
 
     private async Task JoinTable()
@@ -209,13 +246,16 @@
         }
     }
 
-    private async Task DealerDrawCard()
+    private async Task PlayerStands()
     {
         if (_hubConnection != null)
         {
             await _hubConnection.SendAsync("DrawCard", "Dealer");
-            Message = "Dealer drawing card..";
+
+            _playerStands = true;
             _loading = true;
+            Message = "You stand!";
+            
             await InvokeAsync(StateHasChanged);
         }
     }

@@ -34,8 +34,8 @@ public class PictureSymbol : ISlotSymbol
     }
     public ISlotSymbol ShallowClone()
     {
-        var shallowCopy = this;
-        return shallowCopy;
+        var original = this;
+        return original;
     }
     public ISlotSymbol DeepClone()
     {

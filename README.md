@@ -8,7 +8,7 @@
 - [ ] Strategy – ne mažiau 4 strategijos klasių.
 - [ ] Observer – pademonstruoti veikimą per sekų diagram. **WIP**
 - [x] Builder – ne mažiau 2 “konkrečių builderių” (concrete builder).
-- [ ] Adapter – Adapter ir Adaptee turi skirtingus metodų kiekius. **WIP**
+- [x] Adapter – Adapter ir Adaptee turi skirtingus metodų kiekius. **WIP**
 - [x] Prototype – Palyginkite deep ir shallow kopijų sukūrimą, mokėti gynimo metu pakeisti realizaciją, ataskaitoje pateikite rezultatus - atminties adresus,
 - [ ] Decorator – nemažiau 3 dekoravimo lygių,
 - [x] Command – prie komandų turi būti undo() galimybė,

@@ -33,61 +33,68 @@
     </table>
 </div>
 </div>
-<div style="margin: 50px">
-    <h2>REWARDS:</h2>
-    @if (!IsPictureSymbols)
-    {
-        <div style="display: flex;">
-            <div style="background-color: #0000FF; width: 30px; height: 30px; margin: 10px;"></div>
-            <p style="margin-top: 12px"> – x5</p>
-        </div>
-        <div style="display: flex;">
-            <div style="background-color: #FF0000; width: 30px; height: 30px; margin: 10px;"></div>
-            <p style="margin-top: 12px"> – x10</p>
-        </div>
-        <div style="display: flex;">
-            <div style="background-color: #00FF00; width: 30px; height: 30px; margin: 10px;"></div>
-            <p style="margin-top: 12px"> – x40</p>
-        </div>
-        <div style="display: flex;">
-            <div style="background-color: #FFFF00; width: 30px; height: 30px; margin: 10px;"></div>
-            <p style="margin-top: 12px"> – x160</p>
-        </div>
-        <div style="display: flex;">
-            <div style="background-color: #FFA500; width: 30px; height: 30px; margin: 10px;"></div>
-            <p style="margin-top: 12px"> – x1000</p>
-        </div>
-    }
-    else
-    {
-        <div style="display: flex;">
-            <div style="background-color: #fff; background-image: url('assets/1-first.svg'); width: 30px; height: 30px; margin: 10px;"></div>
-            <p style="margin-top: 12px"> – x5</p>
-        </div>
-        <div style="display: flex;">
-            <div style="background-color: #fff; background-image: url('assets/2-second.svg'); width: 30px; height: 30px; margin: 10px;"></div>
-            <p style="margin-top: 12px"> – x10</p>
-        </div>
-        <div style="display: flex;">
+    <div style="margin: 50px">
+        <h2>REWARDS:</h2>
+        @if (!IsPictureSymbols)
+        {
+            <div style="display: flex;">
+                <div style="background-color: #0000FF; width: 30px; height: 30px; margin: 10px;"></div>
+                <p style="margin-top: 12px"> @GetSlotPayout(SymbolTier.First, SlotType)</p>
+            </div>
+            <div style="display: flex;">
+                <div style="background-color: #FF0000; width: 30px; height: 30px; margin: 10px;"></div>
+                <p style="margin-top: 12px"> @GetSlotPayout(SymbolTier.Second, SlotType)</p>
+            </div>
+            <div style="display: flex;">
+                <div style="background-color: #00FF00; width: 30px; height: 30px; margin: 10px;"></div>
+                <p style="margin-top: 12px"> @GetSlotPayout(SymbolTier.Third, SlotType)</p>
+            </div>
+            <div style="display: flex;">
+                <div style="background-color: #FFFF00; width: 30px; height: 30px; margin: 10px;"></div>
+                <p style="margin-top: 12px"> @GetSlotPayout(SymbolTier.Fourth, SlotType)</p>
+            </div>
+            <div style="display: flex;">
+                <div style="background-color: #FFA500; width: 30px; height: 30px; margin: 10px;"></div>
+                <p style="margin-top: 12px"> @GetSlotPayout(SymbolTier.Fifth, SlotType)</p>
+            </div>
+        }
+        else
+        {
+            <div style="display: flex;">
+                <div style="background-color: #fff; background-image: url('assets/1-first.svg'); width: 30px; height: 30px; margin: 10px;"></div>
+                <p style="margin-top: 12px"> @GetSlotPayout(SymbolTier.First, SlotType)</p>
+            </div>
+            <div style="display: flex;">
+                <div style="background-color: #fff; background-image: url('assets/2-second.svg'); width: 30px; height: 30px; margin: 10px;"></div>
+                <p style="margin-top: 12px"> @GetSlotPayout(SymbolTier.Second, SlotType)</p>
+            </div>
+            <div style="display: flex;">
                 <div style="background-color: #fff; background-image: url('assets/3-third.svg'); width: 30px; height: 30px; margin: 10px;"></div>
-            <p style="margin-top: 12px"> – x40</p>
-        </div>
-        <div style="display: flex;">
+                <p style="margin-top: 12px"> @GetSlotPayout(SymbolTier.Third, SlotType)</p>
+            </div>
+            <div style="display: flex;">
                 <div style="background-color: #fff; background-image: url('assets/4-fourth.svg'); width: 30px; height: 30px; margin: 10px;"></div>
-            <p style="margin-top: 12px"> – x160</p>
-        </div>
-        <div style="display: flex;">
+                <p style="margin-top: 12px"> @GetSlotPayout(SymbolTier.Fourth, SlotType)</p>
+            </div>
+            <div style="display: flex;">
                 <div style="background-color: #fff; background-image: url('assets/5-fifth.svg'); width: 30px; height: 30px; margin: 10px;"></div>
-            <p style="margin-top: 12px"> – x1000</p>
-        </div>
-    }
-</div>
+                <p style="margin-top: 12px"> @GetSlotPayout(SymbolTier.Fifth, SlotType)</p>
+            </div>
+        }
+    </div>
+    <div style="margin: 50px; display: flex; flex-direction: column">
+        <button class="btn btn-info" style="margin: 5px;" @onclick="() => ChangeSlotType(SlotType.Simple)">Play Simple slots</button>
+        <button class="btn btn-info" style="margin: 5px;" @onclick="() => ChangeSlotType(SlotType.Coinflip)">Play Coinflip slots</button>
+        <button class="btn btn-info" style="margin: 5px;" @onclick="() => ChangeSlotType(SlotType.WinLose)">Play Win / Lose slots</button>
+        <button class="btn btn-info" style="margin: 5px;" @onclick="() => ChangeSlotType(SlotType.Jackpot)">Play Jackpot slots</button>
+    </div>
 </div>
 
 <input @bind="BetSize" type="number" />
 <button class="btn btn-primary" @onclick="Play">Click me</button>
-<button class="btn btn-secondary" @onclick="ChangeSlotType">Switch slot type</button>
+<button class="btn btn-secondary" @onclick="UseAlternativeSymbols">Use alternative symbols</button>
 <button class="btn btn-info" @onclick="ChangeSlotsStyle">Changed slots style</button>
+
 
 <ul style="width: 300px">
     @foreach (var message in Messages)
@@ -107,6 +114,7 @@
     public List<string> Messages { get; set; } = new List<string>();
     public List<ISlotSymbol> Results { get; set; } = new List<ISlotSymbol> {};
     public ISlotsMachineStyle SlotsMachineStyle { get; set; }
+    public SlotType SlotType { get; set; } = SlotType.Simple;
 
     protected override async Task OnInitializedAsync()
     {
@@ -163,6 +171,21 @@
             {
                 Message = "YOU LOST!!";
             }
+            else if (SlotType == SlotType.WinLose)
+            {
+                if (result.Payout == BetSize)
+                {
+                    Message = "You broke even!";
+                }
+                else if (result.Payout > 0)
+                {
+                    Message = $"WINNNEEEERRRR +{result.Payout}";
+                }
+                else if (result.Payout < 0)
+                {
+                    Message = $"Unlucky!!! You lost {result.Payout}";
+                }
+            }
             else
             {
                 Message = $"WINNNEEEERRRR +{result.Payout}";
@@ -186,13 +209,19 @@
         if (hubConnection is not null)
         {
             Balance -= BetSize;
-            await hubConnection.SendAsync("Play", Name, BetSize, IsPictureSymbols);
+            await hubConnection.SendAsync("Play", Name, BetSize, IsPictureSymbols, SlotType);
         }
     }
 
-    private async Task ChangeSlotType()
+    private async Task UseAlternativeSymbols()
     {
         IsPictureSymbols = !IsPictureSymbols;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task ChangeSlotType(SlotType type)
+    {
+        SlotType = type;
         await InvokeAsync(StateHasChanged);
     }
 
@@ -235,4 +264,62 @@
         await InvokeAsync(StateHasChanged);
     }
 
+    private string GetSlotPayout(SymbolTier tier, SlotType type)
+    {
+        if (type == SlotType.Simple)
+        {
+            switch (tier)
+            {
+                case SymbolTier.First:
+                    return " - 5x";
+                case SymbolTier.Second:
+                    return " - 10x";
+                case SymbolTier.Third:
+                    return " - 40x";
+                case SymbolTier.Fourth:
+                    return " - 160x";
+                case SymbolTier.Fifth:
+                    return " - 1000x";
+            }
+        }
+        else if (type == SlotType.Coinflip)
+        {
+            switch (tier)
+            {
+                case SymbolTier.First:
+                    return " - 2x";
+                case SymbolTier.Second:
+                    return " - 0x";
+                default:
+                    return " ----------- ";
+            }
+        }
+        else if (type == SlotType.WinLose)
+        {
+            switch (tier)
+            {
+                case SymbolTier.First:
+                    return " - 5x";
+                case SymbolTier.Second:
+                    return " - 2x";
+                case SymbolTier.Third:
+                    return " - 1x";
+                case SymbolTier.Fourth:
+                    return " - -2x";
+                case SymbolTier.Fifth:
+                    return " - -5x";
+            }
+        }
+        else if (type == SlotType.Jackpot)
+        {
+            switch (tier)
+            {
+                case SymbolTier.First:
+                    return " - 10000x";
+                default:
+                    return " ----------- ";
+            }
+        }
+        throw new ArgumentOutOfRangeException(nameof(type));
+    }
 }

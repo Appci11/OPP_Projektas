@@ -8,10 +8,10 @@ namespace OPP_Projektas.Server.GameHubs;
 
 public class SlotsHub : Hub
 {
-    public async Task Play(string playerName, int betSize, bool isPictureSymbols)
+    public async Task Play(string playerName, int betSize, bool isPictureSymbols, SlotType slotType)
     {
         var slots = Slots.GetInstance();
-        var win = slots.Play(betSize, isPictureSymbols);
+        var win = slots.Play(betSize, isPictureSymbols, slotType);
         await Clients.Caller.SendAsync("Test");
         await Clients.Caller.SendAsync("Something",  win);
         Console.WriteLine("Sent message");

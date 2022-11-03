@@ -5,7 +5,6 @@ PS. "@using blablabla" galima i _Imports.razor det, tuomet visiem puslapiam gali
 *@
 
 @page "/roulette"
-@using OPP_Projektas.Client.Models.Roulette
 @inject ILocalStorageService LocalStorage
 @inject NavigationManager NavigationManager
 @implements IAsyncDisposable
@@ -27,17 +26,19 @@ else
     <p>Number of players: @playerCount</p>
     <p>Number of bets placed: @betsPlacedCound</p>
     <br />
-    <h3>Rolled number: @rolledNumber</h3>
+    <h3>Rolled number: @Wheel.WheelNumbers[RolledNumberIndex].Number @Wheel.WheelNumbers[RolledNumberIndex].Colour</h3>
     <br />
     if (!betPlaced)
     {
-        <button class="btn btn-primary" @onclick="PlaceABet">Place a bet</button>
-        <p>Bet ammount = @betAmmount</p>
+        <div>
+            <input @bind="BetAmmount" type="number" aria-label="Bet Ammount:" />
+            <button class="btn btn-primary" @onclick="PlaceABet">Place a bet</button>
+        </div>
     }
     <br />
     <br />
     <p>Your chips:</p>
-    <ChipsList ChipAmmounts="@NewKeeper.Chips"/>
+    <ChipsList ChipAmmounts="@NewKeeper.Chips" />
 
     <p>Message log:</p>
     <ul id="messagesList">
@@ -52,12 +53,13 @@ else
     private HubConnection? hubConnection;
     public bool IsConnected => hubConnection?.State == HubConnectionState.Connected;
 
+    Wheel Wheel = new Wheel();
     private string username = string.Empty;
     private int playerCount = 0;
     private int betsPlacedCound = 0;
-    private int rolledNumber = -999;
+    private int RolledNumberIndex = 0;
     private bool betPlaced = false;
-    int betAmmount = 3;
+    int BetAmmount = 1;
     //private int[] ChipAmmounts { get; set; } = { -1, -1, -1, -1, -1, -1 };
     private List<string> messages = new List<string>();
 
@@ -76,9 +78,9 @@ else
             .WithUrl(NavigationManager.ToAbsoluteUri($"/roulettehub?username={username}"))
             .Build();
 
-        hubConnection.On<string>("GetMessage", (user) =>
+        hubConnection.On<string>("GetMessage", (message) =>
         {
-            var msg = user;
+            var msg = message;
             if (messages.Count < 5)
             {
                 messages.Add(msg);
@@ -104,9 +106,9 @@ else
             StateHasChanged();
         });
 
-        hubConnection.On<int>("GetRolledNumber", (number) =>
+        hubConnection.On<int>("GetRolledNumberIndex", (rolledNumberIndex) =>
         {
-            rolledNumber = number;
+            RolledNumberIndex = rolledNumberIndex;
             betPlaced = false;
             StateHasChanged();
         });
@@ -120,9 +122,9 @@ else
     {
         if (hubConnection != null)
         {
-            await hubConnection.SendAsync("PlaceABet");
+            await hubConnection.SendAsync("PlaceABet", BetAmmount);
             betPlaced = true;
-            Keeper.RemoveChips(betAmmount);
+            Keeper.RemoveChips(BetAmmount);
             NewKeeper.Chips = Adapter.GetChips();
         }
     }

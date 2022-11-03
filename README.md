@@ -1,12 +1,5 @@
 Truksta:
-
-Strategy
-Observer
-Adapter
-Decorator
-Facade
-Bridge
+Strategy Adapter Decorator Facade Bridge
 
 Working on:
-
 Observer

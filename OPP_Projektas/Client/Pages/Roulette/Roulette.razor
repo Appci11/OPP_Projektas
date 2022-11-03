@@ -5,6 +5,7 @@ PS. "@using blablabla" galima i _Imports.razor det, tuomet visiem puslapiam gali
 *@
 
 @page "/roulette"
+@using OPP_Projektas.Client.Models.Roulette
 @inject ILocalStorageService LocalStorage
 @inject NavigationManager NavigationManager
 @implements IAsyncDisposable
@@ -31,11 +32,12 @@ else
     if (!betPlaced)
     {
         <button class="btn btn-primary" @onclick="PlaceABet">Place a bet</button>
+        <p>Bet ammount = @betAmmount</p>
     }
     <br />
     <br />
     <p>Your chips:</p>
-    <ChipsList ChipAmmounts="@ChipAmmounts"/>
+    <ChipsList ChipAmmounts="@NewKeeper.Chips"/>
 
     <p>Message log:</p>
     <ul id="messagesList">
@@ -55,11 +57,15 @@ else
     private int betsPlacedCound = 0;
     private int rolledNumber = -999;
     private bool betPlaced = false;
-    private int[] ChipAmmounts { get; set; } = { -2, -1, -1, -1, -1, -1 };
+    int betAmmount = 3;
+    //private int[] ChipAmmounts { get; set; } = { -1, -1, -1, -1, -1, -1 };
     private List<string> messages = new List<string>();
 
-    //await LocalStorage.SetItemAsync("token", token);
-    //await LocalStorage.RemoveItemAsync("token");
+    static ChipsKeeper Keeper = new ChipsKeeper();
+    static IChipsConverter Adapter = new ChipsAdapter(Keeper);
+    NewChipsKeeper NewKeeper = new NewChipsKeeper(Adapter.GetChips());
+    //await LocalStorage.SetItemAsync("token", token);  //local storage example
+    //await LocalStorage.RemoveItemAsync("token");  //galima ir asString, pasigooglinsit jei reiks
 
     private async Task Connect()
     {
@@ -116,6 +122,8 @@ else
         {
             await hubConnection.SendAsync("PlaceABet");
             betPlaced = true;
+            Keeper.RemoveChips(betAmmount);
+            NewKeeper.Chips = Adapter.GetChips();
         }
     }
 

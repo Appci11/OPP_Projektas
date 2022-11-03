@@ -1,0 +1,32 @@
+﻿@if (src != null)
+{
+    @*    <table>
+        <tr>
+            <td><img src="@src" style="width=50px; height: 50px;" /></td>
+            <td><h4>@Ammount</h4></td>
+        </tr>
+    </table>*@
+
+
+    <img src="@src" style="width=50px; height: 50px; text-align: center" />
+    <h4 style="text-align: center">@Ammount</h4>
+
+}
+else
+{
+    <p>...</p>
+}
+
+@code {
+    [Parameter]
+    public int ChipNumber { get; set; } = 1;
+    [Parameter]
+    public int Ammount { get; set; } = -1;
+    private string src { get; set; } = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        src = $"/assets/Images/Chips/Chip{ChipNumber}.jpg";
+        base.OnInitialized();
+    }
+}

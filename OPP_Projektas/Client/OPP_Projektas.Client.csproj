@@ -7,6 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\assets\Images\Chips\Chip1.jpg" />
+    <None Include="wwwroot\assets\Images\Chips\Chip10.jpg" />
+    <None Include="wwwroot\assets\Images\Chips\Chip100.jpg" />
+    <None Include="wwwroot\assets\Images\Chips\Chip25.jpg" />
+    <None Include="wwwroot\assets\Images\Chips\Chip5.jpg" />
+    <None Include="wwwroot\assets\Images\Chips\Chip50.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Blazored.LocalStorage" Version="4.3.0-preview.1" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.4" PrivateAssets="all" />

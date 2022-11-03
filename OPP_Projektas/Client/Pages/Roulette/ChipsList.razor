@@ -1,0 +1,18 @@
+﻿@if (ChipAmmounts != null)
+{
+    <table>
+        <tr>
+            @for (int i = 0; i < 6; i++)
+            {
+                <td>
+                    <ChipAmmount ChipNumber="ChipValues[i]" Ammount="ChipAmmounts[i]" /></td>
+            }
+        </tr>
+    </table>
+}
+
+@code {
+    [Parameter]
+    public int[] ChipAmmounts { get; set; } = null;
+    static int[] ChipValues = { 1, 5, 10, 25, 50, 100 };
+}

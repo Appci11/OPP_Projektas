@@ -26,15 +26,18 @@ else
     <p>Number of players: @playerCount</p>
     <p>Number of bets placed: @betsPlacedCound</p>
     <br />
-    if (rolledNumber > -1)
-    {
-        <h3>Rolled number: @rolledNumber</h3>
-    }
+    <h3>Rolled number: @rolledNumber</h3>
     <br />
     if (!betPlaced)
     {
         <button class="btn btn-primary" @onclick="PlaceABet">Place a bet</button>
     }
+    <br />
+    <br />
+    <p>Your chips:</p>
+    <ChipsList ChipAmmounts="@ChipAmmounts"/>
+
+    <p>Message log:</p>
     <ul id="messagesList">
         @foreach (var message in messages)
         {
@@ -50,8 +53,9 @@ else
     private string username = string.Empty;
     private int playerCount = 0;
     private int betsPlacedCound = 0;
-    private int rolledNumber = -1;
+    private int rolledNumber = -999;
     private bool betPlaced = false;
+    private int[] ChipAmmounts { get; set; } = { -2, -1, -1, -1, -1, -1 };
     private List<string> messages = new List<string>();
 
     //await LocalStorage.SetItemAsync("token", token);

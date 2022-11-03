@@ -1,5 +1,9 @@
 Truksta:
-Strategy Adapter Decorator Facade Bridge
+Strategy
+Decorator
+Facade
+Bridge
 
 Working on:
 Observer
+Adapter

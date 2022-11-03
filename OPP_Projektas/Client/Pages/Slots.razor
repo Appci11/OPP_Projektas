@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.SignalR.Client
 @using OPP_Projektas.Shared.Models.Enums.Slots
 @using OPP_Projektas.Shared.Models.Slots
+@using OPP_Projektas.Shared.Models.Slots.SymbolTiers
 @using OPP_Projektas.Shared.Models.Slots.SlotSymbols
 @using OPP_Projektas.Shared.Models.Slots.SlotSymbols.Rollers
 @using OPP_Projektas.Shared.Models.Styles
@@ -39,46 +40,46 @@
         {
             <div style="display: flex;">
                 <div style="background-color: #0000FF; width: 30px; height: 30px; margin: 10px;"></div>
-                <p style="margin-top: 12px"> @GetSlotPayout(SymbolTier.First, SlotType)</p>
+                <p style="margin-top: 12px"> @GetSlotPayout(new TierFirst(), SlotType)</p>
             </div>
             <div style="display: flex;">
                 <div style="background-color: #FF0000; width: 30px; height: 30px; margin: 10px;"></div>
-                <p style="margin-top: 12px"> @GetSlotPayout(SymbolTier.Second, SlotType)</p>
+                <p style="margin-top: 12px"> @GetSlotPayout(new TierSecond(), SlotType)</p>
             </div>
             <div style="display: flex;">
                 <div style="background-color: #00FF00; width: 30px; height: 30px; margin: 10px;"></div>
-                <p style="margin-top: 12px"> @GetSlotPayout(SymbolTier.Third, SlotType)</p>
+                <p style="margin-top: 12px"> @GetSlotPayout(new TierThird(), SlotType)</p>
             </div>
             <div style="display: flex;">
                 <div style="background-color: #FFFF00; width: 30px; height: 30px; margin: 10px;"></div>
-                <p style="margin-top: 12px"> @GetSlotPayout(SymbolTier.Fourth, SlotType)</p>
+                <p style="margin-top: 12px"> @GetSlotPayout(new TierFourth(), SlotType)</p>
             </div>
             <div style="display: flex;">
                 <div style="background-color: #FFA500; width: 30px; height: 30px; margin: 10px;"></div>
-                <p style="margin-top: 12px"> @GetSlotPayout(SymbolTier.Fifth, SlotType)</p>
+                <p style="margin-top: 12px"> @GetSlotPayout(new TierFifth(), SlotType)</p>
             </div>
         }
         else
         {
             <div style="display: flex;">
                 <div style="background-color: #fff; background-image: url('assets/1-first.svg'); width: 30px; height: 30px; margin: 10px;"></div>
-                <p style="margin-top: 12px"> @GetSlotPayout(SymbolTier.First, SlotType)</p>
+                <p style="margin-top: 12px"> @GetSlotPayout(new TierFirst(), SlotType)</p>
             </div>
             <div style="display: flex;">
                 <div style="background-color: #fff; background-image: url('assets/2-second.svg'); width: 30px; height: 30px; margin: 10px;"></div>
-                <p style="margin-top: 12px"> @GetSlotPayout(SymbolTier.Second, SlotType)</p>
+                <p style="margin-top: 12px"> @GetSlotPayout(new TierSecond(), SlotType)</p>
             </div>
             <div style="display: flex;">
                 <div style="background-color: #fff; background-image: url('assets/3-third.svg'); width: 30px; height: 30px; margin: 10px;"></div>
-                <p style="margin-top: 12px"> @GetSlotPayout(SymbolTier.Third, SlotType)</p>
+                <p style="margin-top: 12px"> @GetSlotPayout(new TierThird(), SlotType)</p>
             </div>
             <div style="display: flex;">
                 <div style="background-color: #fff; background-image: url('assets/4-fourth.svg'); width: 30px; height: 30px; margin: 10px;"></div>
-                <p style="margin-top: 12px"> @GetSlotPayout(SymbolTier.Fourth, SlotType)</p>
+                <p style="margin-top: 12px"> @GetSlotPayout(new TierFourth(), SlotType)</p>
             </div>
             <div style="display: flex;">
                 <div style="background-color: #fff; background-image: url('assets/5-fifth.svg'); width: 30px; height: 30px; margin: 10px;"></div>
-                <p style="margin-top: 12px"> @GetSlotPayout(SymbolTier.Fifth, SlotType)</p>
+                <p style="margin-top: 12px"> @GetSlotPayout(new TierFifth(), SlotType)</p>
             </div>
         }
     </div>
@@ -121,9 +122,9 @@
         SlotsMachineStyle = _style.CreateSlotsMachineStyle();
         
         SlotRoller roller = new ColorSlotRoller();
-        Results.Add(roller.CreateSymbol(SymbolTier.Fifth));
-        Results.Add(roller.CreateSymbol(SymbolTier.Fifth));
-        Results.Add(roller.CreateSymbol(SymbolTier.Fifth));
+        Results.Add(roller.CreateSymbol(new TierFifth()));
+        Results.Add(roller.CreateSymbol(new TierFifth()));
+        Results.Add(roller.CreateSymbol(new TierFifth()));
 
         hubConnection = new HubConnectionBuilder()
             .WithUrl(NavigationManager.ToAbsoluteUri("/slotshub")).WithAutomaticReconnect()
@@ -147,13 +148,13 @@
                 {
                     switch(i){
                         case 0:
-                            Results = new List<ISlotSymbol> { fakeResultRoller.CreateSymbol((SymbolTier)rand.Next(0, 5)), fakeResultRoller.CreateSymbol((SymbolTier)rand.Next(0, 5)), fakeResultRoller.CreateSymbol((SymbolTier)rand.Next(0, 5)) };
+                            Results = new List<ISlotSymbol> { fakeResultRoller.CreateSymbol(rand.Next(0, 5)), fakeResultRoller.CreateSymbol(rand.Next(0, 5)), fakeResultRoller.CreateSymbol(rand.Next(0, 5)) };
                             break;
                         case 1:
-                            Results = new List<ISlotSymbol> { Results[0], fakeResultRoller.CreateSymbol((SymbolTier)rand.Next(0, 5)), fakeResultRoller.CreateSymbol((SymbolTier)rand.Next(0, 5)) };
+                            Results = new List<ISlotSymbol> { Results[0], fakeResultRoller.CreateSymbol(rand.Next(0, 5)), fakeResultRoller.CreateSymbol(rand.Next(0, 5)) };
                             break;
                         case 2:
-                            Results = new List<ISlotSymbol> { Results[0], Results[1], fakeResultRoller.CreateSymbol((SymbolTier)rand.Next(0, 5)) };
+                            Results = new List<ISlotSymbol> { Results[0], Results[1], fakeResultRoller.CreateSymbol(rand.Next(0, 5)) };
                             break;
                     }
                     await Task.Delay(50);
@@ -264,21 +265,21 @@
         await InvokeAsync(StateHasChanged);
     }
 
-    private string GetSlotPayout(SymbolTier tier, SlotType type)
+    private string GetSlotPayout(ISymbolTier tier, SlotType type)
     {
         if (type == SlotType.Simple)
         {
             switch (tier)
             {
-                case SymbolTier.First:
+                case TierFirst:
                     return " - 5x";
-                case SymbolTier.Second:
+                case TierSecond:
                     return " - 10x";
-                case SymbolTier.Third:
+                case TierThird:
                     return " - 40x";
-                case SymbolTier.Fourth:
+                case TierFourth:
                     return " - 160x";
-                case SymbolTier.Fifth:
+                case TierFifth:
                     return " - 1000x";
             }
         }
@@ -286,9 +287,9 @@
         {
             switch (tier)
             {
-                case SymbolTier.First:
+                case TierFirst:
                     return " - 2x";
-                case SymbolTier.Second:
+                case TierSecond:
                     return " - 0x";
                 default:
                     return " ----------- ";
@@ -298,15 +299,15 @@
         {
             switch (tier)
             {
-                case SymbolTier.First:
+                case TierFirst:
                     return " - 5x";
-                case SymbolTier.Second:
+                case TierSecond:
                     return " - 2x";
-                case SymbolTier.Third:
+                case TierThird:
                     return " - 1x";
-                case SymbolTier.Fourth:
+                case TierFourth:
                     return " - -2x";
-                case SymbolTier.Fifth:
+                case TierFifth:
                     return " - -5x";
             }
         }
@@ -314,7 +315,7 @@
         {
             switch (tier)
             {
-                case SymbolTier.First:
+                case TierFirst:
                     return " - 10000x";
                 default:
                     return " ----------- ";

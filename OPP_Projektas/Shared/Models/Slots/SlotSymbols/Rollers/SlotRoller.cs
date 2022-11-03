@@ -1,14 +1,21 @@
-﻿using OPP_Projektas.Shared.Models.Enums.Slots;
+﻿using OPP_Projektas.Shared.Models.Slots.SymbolTiers;
 
 namespace OPP_Projektas.Shared.Models.Slots.SlotSymbols.Rollers;
 
 public abstract class SlotRoller
 {
-    public abstract ISlotSymbol CreateSymbol(SymbolTier symbolTier);
+    public abstract ISlotSymbol CreateSymbol(int tier);
+    public abstract ISlotSymbol CreateSymbol(ISymbolTier tier);
 
-    public string Render(SymbolTier symbolTier)
+    public string Render(int tier)
     {
-        var symbol = CreateSymbol(symbolTier);
+        var symbol = CreateSymbol(tier);
+
+        return symbol.Render();
+    }
+    public string Render(ISymbolTier tier)
+    {
+        var symbol = CreateSymbol(tier);
 
         return symbol.Render();
     }

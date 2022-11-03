@@ -9,8 +9,4 @@
   <ItemGroup>
     <SupportedPlatform Include="browser" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Models\Slots\SlotSymbols\Rollers\" />
-  </ItemGroup>
 </Project>

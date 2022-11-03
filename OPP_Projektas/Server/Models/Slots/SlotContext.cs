@@ -1,5 +1,6 @@
 ﻿using OPP_Projektas.Shared.Models.Enums.Slots;
 using OPP_Projektas.Shared.Models.Slots.SlotSymbols;
+using OPP_Projektas.Shared.Models.Slots.SymbolTiers;
 
 namespace OPP_Projektas.Server.Models.Slots;
 
@@ -12,7 +13,7 @@ public class SlotContext
         _strategy = strategy;
     }
 
-    public (int payout, List<SymbolTier> result) PlayStategy(int betAmount, bool isAlternativeStyle)
+    public (int payout, List<ISymbolTier> result) PlayStategy(int betAmount, bool isAlternativeStyle)
     {
         return _strategy.Play(betAmount, isAlternativeStyle);
     }

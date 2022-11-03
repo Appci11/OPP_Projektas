@@ -1,61 +1,82 @@
 ﻿using OPP_Projektas.Shared.Models.Enums.Slots;
 using OPP_Projektas.Shared.Models.Slots.SlotSymbols.Rollers;
 using OPP_Projektas.Shared.Models.Slots.SlotSymbols;
+using OPP_Projektas.Shared.Models.Slots.SymbolTiers;
 
 namespace OPP_Projektas.Server.Models.Slots;
 
 public class SimpleSlotStrategy : ISlotStrategy
 {
-    private readonly Dictionary<SymbolTier, int> payouts = new Dictionary<SymbolTier, int>
+    private readonly Dictionary<ISymbolTier, int> payouts = new Dictionary<ISymbolTier, int>
     {
-        {SymbolTier.First, 5},
-        {SymbolTier.Second, 10},
-        {SymbolTier.Third, 40},
-        {SymbolTier.Fourth, 160},
-        {SymbolTier.Fifth, 1000},
+        {new TierFirst(), 5},
+        {new TierSecond(), 10},
+        {new TierThird(), 40},
+        {new TierFourth(), 160},
+        {new TierFifth(), 1000},
     };
 
-    public (int payout, List<SymbolTier> result) Play(int betAmount, bool isAlternativeStyle)
+    public (int payout, List<ISymbolTier> result) Play(int betAmount, bool isAlternativeStyle)
     {
         var rng = new Random(Guid.NewGuid().GetHashCode());
 
         var number = rng.Next(1000 + 25) - 24;
-        var symbolValues = new List<SymbolTier>();
+        var symbolValues = new List<ISymbolTier>();
         var payout = 0;
 
         if (number >= 999)
         {
-            payout = betAmount * payouts[SymbolTier.Fifth];
-            symbolValues = new List<SymbolTier> { SymbolTier.Fifth, SymbolTier.Fifth, SymbolTier.Fifth };
+            payout = betAmount * payouts[new TierFifth()];
+            symbolValues = new List<ISymbolTier> { new TierFifth(), new TierFifth(), new TierFifth() };
         }
         if (number >= 995)
         {
-            payout = betAmount * payouts[SymbolTier.Fourth];
-            symbolValues = new List<SymbolTier> { SymbolTier.Fourth, SymbolTier.Fourth, SymbolTier.Fourth };
+            payout = betAmount * payouts[new TierFourth()];
+            symbolValues = new List<ISymbolTier> { new TierFourth(), new TierFourth(), new TierFourth() };
         }
         if (number >= 990)
         {
-            payout = betAmount * payouts[SymbolTier.Third];
-            symbolValues = new List<SymbolTier> { SymbolTier.Third, SymbolTier.Third, SymbolTier.Third };
+            payout = betAmount * payouts[new TierThird()];
+            symbolValues = new List<ISymbolTier> { new TierThird(), new TierThird(), new TierThird() };
         }
         if (number >= 950)
         {
-            payout = betAmount * payouts[SymbolTier.Second];
-            symbolValues = new List<SymbolTier> { SymbolTier.Second, SymbolTier.Second, SymbolTier.Second };
+            payout = betAmount * payouts[new TierSecond()];
+            symbolValues = new List<ISymbolTier> { new TierSecond(), new TierSecond(), new TierSecond() };
         }
         if (number >= 800)
         {
-            payout = betAmount * payouts[SymbolTier.First];
-            symbolValues = new List<SymbolTier> { SymbolTier.First, SymbolTier.First, SymbolTier.First };
+            payout = betAmount * payouts[new TierFirst()];
+            symbolValues = new List<ISymbolTier> { new TierFirst(), new TierFirst(), new TierFirst() };
         }
 
         if (!symbolValues.Any())
         {
-            symbolValues = new List<SymbolTier>() { SymbolTier.Fifth, SymbolTier.Fifth, SymbolTier.Fifth };
+            symbolValues = new List<ISymbolTier>() { new TierFifth(), new TierFifth(), new TierFifth() };
             while (!symbolValues.Distinct().Skip(1).Any())
             {
-                symbolValues = new List<SymbolTier>
-                    {(SymbolTier) rng.Next(0, 5), (SymbolTier) rng.Next(0, 5), (SymbolTier) rng.Next(0, 5)};
+                for (int i = 0; i < 3; i++)
+                {
+                    int choice = rng.Next(0, 5);
+                    switch (choice)
+                    {
+                        case 0:
+                            symbolValues[i] = new TierFirst();
+                            break;
+                        case 1:
+                            symbolValues[i] = new TierSecond();
+                            break;
+                        case 2:
+                            symbolValues[i] = new TierThird();
+                            break;
+                        case 3:
+                            symbolValues[i] = new TierFourth();
+                            break;
+                        case 4:
+                            symbolValues[i] = new TierFifth();
+                            break;
+                    }
+                }
             }
         }
 

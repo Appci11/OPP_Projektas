@@ -1,10 +1,10 @@
-﻿using OPP_Projektas.Shared.Models.Enums.Slots;
+﻿using OPP_Projektas.Shared.Models.Slots.SymbolTiers;
 
 namespace OPP_Projektas.Shared.Models.Slots.SlotSymbols;
 
 public interface ISlotSymbol
 {
-    public SymbolTier SymbolTier { get; set; }
+    public ISymbolTier SymbolTier { get; set; }
     public string Render();
     public ISlotSymbol ShallowClone()
     {

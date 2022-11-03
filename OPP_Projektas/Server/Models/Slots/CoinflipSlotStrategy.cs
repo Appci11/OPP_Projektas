@@ -1,32 +1,33 @@
 ﻿using OPP_Projektas.Shared.Models.Enums.Slots;
+using OPP_Projektas.Shared.Models.Slots.SymbolTiers;
 
 namespace OPP_Projektas.Server.Models.Slots;
 
 public class CoinflipSlotStrategy : ISlotStrategy
 {
-    private readonly Dictionary<SymbolTier, int> payouts = new Dictionary<SymbolTier, int>
+    private readonly Dictionary<ISymbolTier, int> payouts = new Dictionary<ISymbolTier, int>
     {
-        {SymbolTier.First, 2},
-        {SymbolTier.Second, 0},
+        {new TierFirst(), 2},
+        {new TierSecond(), 0},
     };
 
-    public (int payout, List<SymbolTier> result) Play(int betAmount, bool isAlternativeStyle)
+    public (int payout, List<ISymbolTier> result) Play(int betAmount, bool isAlternativeStyle)
     {
         var rng = new Random(Guid.NewGuid().GetHashCode());
 
         var number = rng.Next(100);
-        List<SymbolTier> symbolValues;
+        List<ISymbolTier> symbolValues;
         var payout = 0;
 
         if (number <= 48)
         {
-            payout = betAmount * payouts[SymbolTier.First];
-            symbolValues = new List<SymbolTier> { SymbolTier.First, SymbolTier.First, SymbolTier.First };
+            payout = betAmount * payouts[new TierFirst()];
+            symbolValues = new List<ISymbolTier> { new TierFirst(), new TierFirst(), new TierFirst() };
         }
         else
         {
-            payout = betAmount * payouts[SymbolTier.Second];
-            symbolValues = new List<SymbolTier> { SymbolTier.Second, SymbolTier.Second, SymbolTier.Second };
+            payout = betAmount * payouts[new TierSecond()];
+            symbolValues = new List<ISymbolTier> { new TierSecond(), new TierSecond(), new TierSecond() };
         }
 
         return (payout, symbolValues);

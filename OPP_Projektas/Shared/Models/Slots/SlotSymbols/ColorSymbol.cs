@@ -1,15 +1,15 @@
-﻿using OPP_Projektas.Shared.Models.Enums.Slots;
+﻿using OPP_Projektas.Shared.Models.Slots.SymbolTiers;
 
 namespace OPP_Projektas.Shared.Models.Slots.SlotSymbols;
 
 public class ColorSymbol : ISlotSymbol
 {
-    public SymbolTier SymbolTier { get; set; }
+    public ISymbolTier SymbolTier { get; set; }
     public ColorSymbol(ColorSymbol obj)
     {
         this.SymbolTier = obj.SymbolTier;
     }
-    public ColorSymbol(SymbolTier tier)
+    public ColorSymbol(ISymbolTier tier)
     {
         this.SymbolTier = tier;
     }
@@ -17,15 +17,15 @@ public class ColorSymbol : ISlotSymbol
     {
         switch (SymbolTier)
         {
-            case SymbolTier.First:
+            case TierFirst:
                 return "background-color: #0000FF; width: 100px; height: 100px; margin: 10px;";
-            case SymbolTier.Second:
+            case TierSecond:
                 return "background-color: #FF0000; width: 100px; height: 100px; margin: 10px;";
-            case SymbolTier.Third:
+            case TierThird:
                 return "background-color: #00FF00; width: 100px; height: 100px; margin: 10px;";
-            case SymbolTier.Fourth:
+            case TierFourth:
                 return "background-color: #FFFF00; width: 100px; height: 100px; margin: 10px;";
-            case SymbolTier.Fifth:
+            case TierFifth:
                 return "background-color: #FFA500; width: 100px; height: 100px; margin: 10px;";
             default:
                 return "background-color: #FFFFFF; width: 100px; height: 100px; margin: 10px;";

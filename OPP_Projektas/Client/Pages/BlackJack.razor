@@ -1,9 +1,8 @@
 ﻿@page "/blackjack"
+@using Microsoft.AspNetCore.SignalR.Client
 @using OPP_Projektas.Shared.Models.BlackJack
-@using OPP_Projektas.Shared.Models.Observer
 @using OPP_Projektas.Shared.Models.Styles
 @inject NavigationManager NavigationManager
-@implements IObserver
 
 <PageTitle>BlackJack</PageTitle>
 <div style="display:flex">
@@ -21,20 +20,14 @@
                 {
                     <td style="@CardsStyle.RenderCardBorder()">@card.Suit.ToString() | @card.FaceValue.ToString()</td>
                 }
-                @if (DealerCards.Count > 0)
-                {
-                    <td>@DealerCards.Sum(c => c.ScoreValue)</td>
-                }
+                <td>@DealerCards.Sum(c => c.ScoreValue)</td>
             </tr>
             <tr>
                 @foreach (var card in BlackJackPlayer.Cards)
                 {
                     <td style="@CardsStyle.RenderCardBorder()">@card.Suit.ToString() | @card.FaceValue.ToString()</td>
                 }
-                @if (BlackJackPlayer.Cards.Count > 0)
-                {
-                    <td>@BlackJackPlayer.Cards.Sum(c => c.ScoreValue)</td>
-                }
+                <td>@BlackJackPlayer.Cards.Sum(c => c.ScoreValue)</td>
             </tr>
         </table>
     </div>
@@ -203,8 +196,7 @@
         Console.WriteLine($"New player joined {player.Id} with balance {player.Balance}");
         BlackJackPlayer = player;
         _hideStartGameBtn = false;
-        BlackJackPlayer.Attach(this);
-        
+
         await InvokeAsync(StateHasChanged);
     }
 
@@ -273,18 +265,5 @@
         DealerCards = new List<BlackJackCard>();
         BlackJackPlayer.Cards = new List<BlackJackCard>();
     }
-
-} 
-@functions
-{
-    public void Update(ISubject subject)
-    {
-        if (subject is Subject castedSubject)
-        {
-            if (castedSubject.PropertyName == "Bet")
-            {
-                BlackJackPlayer.Balance -= BlackJackPlayer.Bet;
-            }
-        }
-    }
-}
+    
+    } 

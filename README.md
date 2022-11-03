@@ -5,7 +5,7 @@
 - [x] Singleton – pademonstruoti “thread safe”
 - [x] Factory – šeimoje ne mažiau kaip 3 klasės
 - [x] Abstract Factory – ne mažiau kaip 2 real factory, kiekvienoje šeimoje ne mažiau kaip 3 klasės
-- [ ] Strategy – ne mažiau 4 strategijos klasių. **WIP**
+- [x] Strategy – ne mažiau 4 strategijos klasių.
 - [ ] Observer – pademonstruoti veikimą per sekų diagram. **WIP**
 - [x] Builder – ne mažiau 2 “konkrečių builderių” (concrete builder).
 - [x] Adapter – Adapter ir Adaptee turi skirtingus metodų kiekius.

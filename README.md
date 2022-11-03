@@ -12,7 +12,7 @@
 - [x] Prototype – Palyginkite deep ir shallow kopijų sukūrimą, mokėti gynimo metu pakeisti realizaciją, ataskaitoje pateikite rezultatus - atminties adresus,
 - [ ] Decorator – nemažiau 3 dekoravimo lygių,
 - [x] Command – prie komandų turi būti undo() galimybė,
-- [ ] Façade – ne mažiau 2 “client” klasių ir nemažiau 3 “subsystem” klasių.
+- [ ] Façade – ne mažiau 2 “client” klasių ir nemažiau 3 “subsystem” klasių. **WIP**
 - [ ] Bridge – ne mažiau 2 abstrakcijų ir nemažiau 2 konkrečių realizacijų, paaiškinti skirtumą su Strategy ir Adapter šablonais. **WIP**
 
 ## 2 dalis. Specifiniai reikalavimai šablonams

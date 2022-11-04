@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OPP_Projektas.Shared.Models.Slots.SymbolTiers
 {
-    public interface ISymbolTier
+    public interface ISymbolTier : IEquatable<ISymbolTier>
     {
     }
 }

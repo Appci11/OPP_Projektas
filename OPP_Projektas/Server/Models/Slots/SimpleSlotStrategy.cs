@@ -18,6 +18,12 @@ public class SimpleSlotStrategy : ISlotStrategy
 
     public (int payout, List<ISymbolTier> result) Play(int betAmount, bool isAlternativeStyle)
     {
+        /*var a = new TierFirst();
+        var b = new TierSecond();
+        var c = new TierThird();
+        var d = new TierFourth();
+        var e = new TierFifth();*/
+        
         var rng = new Random(Guid.NewGuid().GetHashCode());
 
         var number = rng.Next(1000 + 25) - 24;
@@ -44,7 +50,7 @@ public class SimpleSlotStrategy : ISlotStrategy
             payout = betAmount * payouts[new TierSecond()];
             symbolValues = new List<ISymbolTier> { new TierSecond(), new TierSecond(), new TierSecond() };
         }
-        if (number >= 800)
+        if (number >= 1)
         {
             payout = betAmount * payouts[new TierFirst()];
             symbolValues = new List<ISymbolTier> { new TierFirst(), new TierFirst(), new TierFirst() };

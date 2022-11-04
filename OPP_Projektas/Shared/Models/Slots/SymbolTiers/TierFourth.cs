@@ -8,5 +8,22 @@ namespace OPP_Projektas.Shared.Models.Slots.SymbolTiers
 {
     public class TierFourth : ISymbolTier
     {
+        private int tier = 4;
+        public bool Equals(ISymbolTier? other)
+        {
+            if (other == null)
+            {
+                return false;
+            }
+            else
+            {
+                return this.GetType().Equals(other.GetType());
+            }
+        }
+
+        public override int GetHashCode()
+        {
+            return tier.GetHashCode();
+        }
     }
 }

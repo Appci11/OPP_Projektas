@@ -120,7 +120,7 @@
     protected override async Task OnInitializedAsync()
     {
         SlotsMachineStyle = _style.CreateSlotsMachineStyle();
-        
+
         SlotRoller roller = new ColorSlotRoller();
         Results.Add(roller.CreateSymbol(new TierFifth()));
         Results.Add(roller.CreateSymbol(new TierFifth()));
@@ -130,7 +130,7 @@
             .WithUrl(NavigationManager.ToAbsoluteUri("/slotshub")).WithAutomaticReconnect()
             .Build();
 
-        hubConnection.On("Test", () => { Console.WriteLine("Test"); });
+        hubConnection.On("Test", () => { Console.WriteLine("Test"); Console.WriteLine("sad"); ; });
 
         hubConnection.On<SlotsResult>("Something", async (result) =>
         {

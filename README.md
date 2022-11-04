@@ -6,14 +6,14 @@
 - [x] Factory – šeimoje ne mažiau kaip 3 klasės
 - [x] Abstract Factory – ne mažiau kaip 2 real factory, kiekvienoje šeimoje ne mažiau kaip 3 klasės
 - [x] Strategy – ne mažiau 4 strategijos klasių.
-- [x] Observer – pademonstruoti veikimą per sekų diagram. **WIP**
+- [x] Observer – pademonstruoti veikimą per sekų diagram.
 - [x] Builder – ne mažiau 2 “konkrečių builderių” (concrete builder).
 - [x] Adapter – Adapter ir Adaptee turi skirtingus metodų kiekius.
 - [x] Prototype – Palyginkite deep ir shallow kopijų sukūrimą, mokėti gynimo metu pakeisti realizaciją, ataskaitoje pateikite rezultatus - atminties adresus,
 - [ ] Decorator – nemažiau 3 dekoravimo lygių,
 - [x] Command – prie komandų turi būti undo() galimybė,
-- [x] Façade – ne mažiau 2 “client” klasių ir nemažiau 3 “subsystem” klasių. **WIP**
-- [x] Bridge – ne mažiau 2 abstrakcijų ir nemažiau 2 konkrečių realizacijų, paaiškinti skirtumą su Strategy ir Adapter šablonais. **WIP**
+- [x] Façade – ne mažiau 2 “client” klasių ir nemažiau 3 “subsystem” klasių.
+- [x] Bridge – ne mažiau 2 abstrakcijų ir nemažiau 2 konkrečių realizacijų, paaiškinti skirtumą su Strategy ir Adapter šablonais.
 
 ## 2 dalis. Specifiniai reikalavimai šablonams
 

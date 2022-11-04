@@ -2,7 +2,7 @@
 {
     public class RouletteMessagesCreator
     {
-        List<string> Messages;
+        List<string>? Messages;
 
         public List<string> FormMessages(List<RouletteUser> users)
         {

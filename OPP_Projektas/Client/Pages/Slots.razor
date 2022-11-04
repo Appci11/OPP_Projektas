@@ -131,21 +131,61 @@
             .Build();
 
         hubConnection.On("Test", () => { Console.WriteLine("Test"); Console.WriteLine("sad"); ; });
+        hubConnection.On<ISymbolTier>("Test2", (garbage) => { Console.WriteLine("Test2"); Console.WriteLine("sad2"); ; });
 
-        hubConnection.On<SlotsResult>("Something", async (result) =>
+        hubConnection.On<Tuple<int, List<SymbolTier>>>("Something", async (resultEnum) =>
         {
             Console.WriteLine("Tester2");
+            Console.WriteLine("resultEnum.Item1 (Payout): " + resultEnum.Item1);
+            Console.WriteLine("resultEnum.Item2.Count (SymbolTier.Count): " + resultEnum.Item2.Count);
+
+            SlotsResult result;
+            List<ISymbolTier> tiers = new List<ISymbolTier>();
+            foreach (SymbolTier tier in resultEnum.Item2)
+            {
+                switch (tier)
+                {
+                    case SymbolTier.First:
+                        tiers.Add(new TierFirst());
+                        break;
+                    case SymbolTier.Second:
+                        tiers.Add(new TierSecond());
+                        break;
+                    case SymbolTier.Third:
+                        tiers.Add(new TierThird());
+                        break;
+                    case SymbolTier.Fourth:
+                        tiers.Add(new TierFourth());
+                        break;
+                    case SymbolTier.Fifth:
+                        tiers.Add(new TierFifth());
+                        break;
+                }
+            }
+
+            result = new SlotsResult(tiers, resultEnum.Item1);
+            Console.WriteLine("result.Payout: "+result.Payout);
+            Console.WriteLine("result.SlotSymbols.Count: " + result.SlotSymbols.Count);
+
             SlotRoller fakeResultRoller;
+            Console.WriteLine("Tester3");
             fakeResultRoller = IsPictureSymbols ? new PictureSlotRoller() : new ColorSlotRoller();
+            Console.WriteLine("trying to get result properties:");
+            Console.WriteLine("result.Payout: "+result.Payout.ToString());
+            Console.WriteLine("result.SlotSymbols.Count: "+result.SlotSymbols.Count);
+            Console.WriteLine("Tester4");
             List<ISlotSymbol> resultingSymbols = new List<ISlotSymbol> { fakeResultRoller.CreateSymbol(result.SlotSymbols[0]), fakeResultRoller.CreateSymbol(result.SlotSymbols[1]), fakeResultRoller.CreateSymbol(result.SlotSymbols[2]) };
+            Console.WriteLine("at rand");
             Random rand = new Random();
             for(int i = 0;i<3;i++){
+                Console.WriteLine("at first for");
                 int switchingAmount = 30;
                 if(i>0){
                     switchingAmount /= 2;
                 }
                 for (int j = 0; j < switchingAmount; j++)
                 {
+                    Console.WriteLine("at second for");
                     switch(i){
                         case 0:
                             Results = new List<ISlotSymbol> { fakeResultRoller.CreateSymbol(rand.Next(0, 5)), fakeResultRoller.CreateSymbol(rand.Next(0, 5)), fakeResultRoller.CreateSymbol(rand.Next(0, 5)) };
@@ -157,9 +197,11 @@
                             Results = new List<ISlotSymbol> { Results[0], Results[1], fakeResultRoller.CreateSymbol(rand.Next(0, 5)) };
                             break;
                     }
+                    Console.WriteLine("at delay");
                     await Task.Delay(50);
                     await InvokeAsync(StateHasChanged);
                 }
+                Console.WriteLine("at Results[i]");
                 Results[i] = fakeResultRoller.CreateSymbol(result.SlotSymbols[i]);
             }
 

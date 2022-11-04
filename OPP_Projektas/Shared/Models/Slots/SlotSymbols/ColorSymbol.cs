@@ -11,6 +11,7 @@ public class ColorSymbol : ISlotSymbol
     }
     public ColorSymbol(ISymbolTier tier)
     {
+        Console.WriteLine("i is in color symbol constructor");
         this.SymbolTier = tier;
     }
     public string Render()

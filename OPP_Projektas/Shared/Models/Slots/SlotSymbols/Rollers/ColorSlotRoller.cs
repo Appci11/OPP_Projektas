@@ -23,6 +23,7 @@ public class ColorSlotRoller : SlotRoller
     }
     public override ISlotSymbol CreateSymbol(ISymbolTier tier)
     {
+        Console.WriteLine("i is in create symbol");
         return new ColorSymbol(tier);
     }
 }

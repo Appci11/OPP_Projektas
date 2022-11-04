@@ -1,8 +1,9 @@
 ﻿@page "/blackjack"
-@using Microsoft.AspNetCore.SignalR.Client
 @using OPP_Projektas.Shared.Models.BlackJack
+@using OPP_Projektas.Shared.Models.Observer
 @using OPP_Projektas.Shared.Models.Styles
 @inject NavigationManager NavigationManager
+@implements OPP_Projektas.Shared.Models.Observer.IObserver
 
 <PageTitle>BlackJack</PageTitle>
 <div style="display:flex">
@@ -20,14 +21,20 @@
                 {
                     <td style="@CardsStyle.RenderCardBorder()">@card.Suit.ToString() | @card.FaceValue.ToString()</td>
                 }
-                <td>@DealerCards.Sum(c => c.ScoreValue)</td>
+                @if (DealerCards.Count > 0)
+                {
+                    <td>@DealerCards.Sum(c => c.ScoreValue)</td>
+                }
             </tr>
             <tr>
                 @foreach (var card in BlackJackPlayer.Cards)
                 {
                     <td style="@CardsStyle.RenderCardBorder()">@card.Suit.ToString() | @card.FaceValue.ToString()</td>
                 }
-                <td>@BlackJackPlayer.Cards.Sum(c => c.ScoreValue)</td>
+                @if(BlackJackPlayer.Cards.Count > 0)
+                {
+                    <td>@BlackJackPlayer.Cards.Sum(c => c.ScoreValue)</td>
+                }
             </tr>
         </table>
     </div>
@@ -124,6 +131,11 @@
         await InvokeAsync(StateHasChanged);
     }
 
+    private void Payouts()
+    {
+        BlackJackPlayer.Balance += (int)(BlackJackPlayer.Bet * 1.5);
+    }
+    
     private void CheckWinner(int dealerScore, int playerScore)
     {
         switch (dealerScore)
@@ -137,6 +149,7 @@
                 _hidePlayButtons = true;
                 Message = "You won";
                 SetupRestartButton();
+                Payouts();
                 break;
             case < 21:
                 _loading = false;
@@ -148,6 +161,7 @@
                 _hidePlayButtons = true;
                 Message = "BLACKJACK! You win!";
                 SetupRestartButton();
+                Payouts();
                 break;
             case > 21:
                 _hidePlayButtons = true;
@@ -168,11 +182,13 @@
         {
             Message = "Player wins";
             SetupRestartButton();
+            Payouts();
         }
         else
         {
             Message = "Draw!";
             SetupRestartButton();
+            BlackJackPlayer.Balance += BlackJackPlayer.Bet;
         }
     }
 
@@ -195,6 +211,7 @@
     {
         Console.WriteLine($"New player joined {player.Id} with balance {player.Balance}");
         BlackJackPlayer = player;
+        BlackJackPlayer.Attach(this);
         _hideStartGameBtn = false;
 
         await InvokeAsync(StateHasChanged);
@@ -265,5 +282,18 @@
         DealerCards = new List<BlackJackCard>();
         BlackJackPlayer.Cards = new List<BlackJackCard>();
     }
-    
-    } 
+
+    public void Update(ISubject subject)
+    {
+        if (subject is not Subject casted) 
+            return;
+        
+        switch (casted.PropertyName)
+        {
+            case "Bet":
+                BlackJackPlayer.Balance -= BlackJackPlayer.Bet;
+                break;
+        }
+    }
+
+} 

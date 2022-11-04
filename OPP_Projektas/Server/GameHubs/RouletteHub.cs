@@ -10,7 +10,7 @@ namespace OPP_Projektas.Server.GameHubs
     //nepamirst paveldet Hub
     public class RouletteHub : Hub
     {
-        private int TotalChips = 10000;
+        ChipsKeeper ChipsKeeper = new ChipsKeeper();
         RouletteFacade Facade = new RouletteFacade(Users);
         //prisijungusiu user'iu rinkinys
         Wheel Wheel = new Wheel();
@@ -74,7 +74,7 @@ namespace OPP_Projektas.Server.GameHubs
         public async Task RollANumber()
         {
             int rolledNumberIndex = Facade.GetRolledNumberIndex();
-            TotalChips += Facade.CalculateChips();
+            ChipsKeeper.Chips += Facade.CalculateChips();
             await Clients.All.SendAsync("GetRolledNumberIndex", rolledNumberIndex);
             betsCount = 0;
             await Clients.All.SendAsync("GetBetsPlacedCount", betsCount);

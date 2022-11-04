@@ -9,15 +9,15 @@ public class ColorSlotRoller : SlotRoller
         switch (tier)
         {
             case 1:
-                return new PictureSymbol(new TierFirst());
+                return new ColorSymbol(new TierFirst());
             case 2:
-                return new PictureSymbol(new TierSecond());
+                return new ColorSymbol(new TierSecond());
             case 3:
-                return new PictureSymbol(new TierThird());
+                return new ColorSymbol(new TierThird());
             case 4:
-                return new PictureSymbol(new TierFourth());
+                return new ColorSymbol(new TierFourth());
             case 5:
-                return new PictureSymbol(new TierFifth());
+                return new ColorSymbol(new TierFifth());
         }
         return null;
     }

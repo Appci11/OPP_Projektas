@@ -199,6 +199,7 @@
                     }
                     Console.WriteLine("at delay");
                     await Task.Delay(50);
+                    Console.WriteLine("at invoke");
                     await InvokeAsync(StateHasChanged);
                 }
                 Console.WriteLine("at Results[i]");

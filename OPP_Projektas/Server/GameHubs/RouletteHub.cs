@@ -10,11 +10,12 @@ namespace OPP_Projektas.Server.GameHubs
     //nepamirst paveldet Hub
     public class RouletteHub : Hub
     {
+        private int TotalChips = 10000;
+        RouletteFacade Facade = new RouletteFacade(Users);
         //prisijungusiu user'iu rinkinys
-        //private static Dictionary<string, RouletteUser> Users = new Dictionary<string, RouletteUser>();
         Wheel Wheel = new Wheel();
         private static List<RouletteUser> Users = new List<RouletteUser>();
-        static int betsCount = 0;
+        static int betsCount = 0;       
 
         public override async Task OnConnectedAsync()
         {
@@ -49,9 +50,20 @@ namespace OPP_Projektas.Server.GameHubs
             await Clients.All.SendAsync("GetPlayerCount", Users.Count);
         }
 
-        public async Task PlaceABet(int BetAmmount)
+        public async Task PlaceABetRed(int BetAmmount)
         {
             Users.FirstOrDefault(u => u.GameId == Context.ConnectionId).BetAmmount = BetAmmount;
+            Users.FirstOrDefault(u => u.GameId == Context.ConnectionId).Bet = "Red";
+            await Clients.All.SendAsync("GetBetsPlacedCount", ++betsCount);
+            if (betsCount >= Users.Count)
+            {
+                await RollANumber();
+            }
+        }
+        public async Task PlaceABetBlack(int BetAmmount)
+        {
+            Users.FirstOrDefault(u => u.GameId == Context.ConnectionId).BetAmmount = BetAmmount;
+            Users.FirstOrDefault(u => u.GameId == Context.ConnectionId).Bet = "Black";
             await Clients.All.SendAsync("GetBetsPlacedCount", ++betsCount);
             if (betsCount >= Users.Count)
             {
@@ -61,12 +73,30 @@ namespace OPP_Projektas.Server.GameHubs
 
         public async Task RollANumber()
         {
-            Random rand = new Random();
-            int rolledNumberIndex = rand.Next(0, 36);
+            int rolledNumberIndex = Facade.GetRolledNumberIndex();
+            TotalChips += Facade.CalculateChips();
             await Clients.All.SendAsync("GetRolledNumberIndex", rolledNumberIndex);
             betsCount = 0;
             await Clients.All.SendAsync("GetBetsPlacedCount", betsCount);
             await Clients.All.SendAsync("GetMessage", $"Rolled #{Wheel.WheelNumbers[rolledNumberIndex].Number}");
+            await SendMessages();
+            await SendWinnings();
+        }
+
+        public async Task SendMessages()
+        {
+            foreach(string message in Facade.GenerateMessages())
+            {
+                await Clients.All.SendAsync("GetMessage", message);
+            }
+        }
+
+        public async Task SendWinnings()
+        {
+            foreach (RouletteUser user in Users)
+            {
+                await Clients.All.SendAsync("GetWinnings", user.Winnings);
+            }
         }
     }
 }

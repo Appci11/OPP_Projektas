@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.ResponseCompression;
 using OPP_Projektas.Server.GameHubs;
+using OPP_Projektas.Server.Services.RouletteServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,7 @@ builder.Services.AddResponseCompression(options =>
     .Concat(new[] { "application/octet-stream" })
 );
 //-----
+builder.Services.AddScoped<IRouletteServices, RouletteServices>();
 
 var app = builder.Build();
 

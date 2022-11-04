@@ -32,11 +32,13 @@ else
     {
         <div>
             <input @bind="BetAmmount" type="number" aria-label="Bet Ammount:" />
-            <button class="btn btn-primary" @onclick="PlaceABet">Place a bet</button>
+            <button class="btn btn-primary" @onclick="PlaceABetRed">Bet Red</button>
+            <button class="btn btn-primary" @onclick="PlaceABetBlack">Bet Black</button>
         </div>
     }
     <br />
     <br />
+    <h4>@Keeper.Chips</h4>
     <p>Your chips:</p>
     <ChipsList ChipAmmounts="@NewKeeper.Chips" />
 
@@ -113,16 +115,33 @@ else
             StateHasChanged();
         });
 
+        hubConnection.On<int>("GetWinnings", (winnings) =>
+        {
+
+            Keeper.AddChips(winnings);
+            StateHasChanged();
+        });
+
 
         //by default reikia, ne savo isgalvota
         await hubConnection.StartAsync();
     }
 
-    private async Task PlaceABet()
+    private async Task PlaceABetRed()
     {
         if (hubConnection != null)
         {
-            await hubConnection.SendAsync("PlaceABet", BetAmmount);
+            await hubConnection.SendAsync("PlaceABetRed", BetAmmount);
+            betPlaced = true;
+            Keeper.RemoveChips(BetAmmount);
+            NewKeeper.Chips = Adapter.GetChips();
+        }
+    }
+    private async Task PlaceABetBlack()
+    {
+        if (hubConnection != null)
+        {
+            await hubConnection.SendAsync("PlaceABetBlack", BetAmmount);
             betPlaced = true;
             Keeper.RemoveChips(BetAmmount);
             NewKeeper.Chips = Adapter.GetChips();

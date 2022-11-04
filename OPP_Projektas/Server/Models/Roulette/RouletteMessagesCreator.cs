@@ -15,7 +15,7 @@
                     bigWin = user.Winnings;
                 }
             }
-            Messages.Add($"Greatest winning: {bigWin}");
+            Messages.Add($"Greatest winning: {bigWin / 2}");
             return Messages;
         }
 

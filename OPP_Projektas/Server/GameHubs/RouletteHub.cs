@@ -3,20 +3,26 @@
 
 using Microsoft.AspNetCore.SignalR;
 using OPP_Projektas.Server.Models.Roulette;
+using OPP_Projektas.Server.Services.RouletteServices;
 using OPP_Projektas.Shared.Models.Chat;
 using OPP_Projektas.Shared.Models.Roulette;
+using OPP_Projektas.Shared.Models.Roulette.Iterator;
+using System.Security.Cryptography;
 
 namespace OPP_Projektas.Server.GameHubs
 {
     //nepamirst paveldet Hub
     public class RouletteHub : Hub
     {
-        ChipsKeeper ChipsKeeper = new ChipsKeeper();
+        static MyIterableCollection myCollection = new MyIterableCollection();
+        static ChipsKeeper ChipsKeeper = new ChipsKeeper();
         RouletteFacade Facade = new RouletteFacade(Users);
         //prisijungusiu user'iu rinkinys
         Wheel Wheel = new Wheel();
         private static List<RouletteUser> Users = new List<RouletteUser>();
-        static int betsCount = 0;       
+        static int betsCount = 0;
+        static int gameNr = 0;
+        static int oldBalance = 1000;
 
         public override async Task OnConnectedAsync()
         {
@@ -29,6 +35,7 @@ namespace OPP_Projektas.Server.GameHubs
             await Clients.All.SendAsync("GetPlayerCount", Users.Count);
             await Clients.All.SendAsync("GetBetsPlacedCount", betsCount);
 
+            myCollection.AddUser(username);
             //needed by default, ne mano ismislas
             await base.OnConnectedAsync();
         }
@@ -94,7 +101,9 @@ namespace OPP_Projektas.Server.GameHubs
 
         public async Task SendMessages()
         {
-            foreach(string message in Facade.GenerateMessages())
+            
+                        
+            foreach (string message in Facade.GenerateMessages())
             {
                 await Clients.All.SendAsync("GetMessage", message);
             }
@@ -102,11 +111,24 @@ namespace OPP_Projektas.Server.GameHubs
 
         public async Task SendWinnings()
         {
+            int diff = ChipsKeeper.Chips - oldBalance;
+            oldBalance = ChipsKeeper.Chips;
+            myCollection.AddToLog($"Game nr: {++gameNr}  Table Chips gain: {diff}");
             foreach (RouletteUser user in Users)
             {
                 await Clients.Client(user.GameId).SendAsync("GetWinnings", user.Winnings);
-                Console.WriteLine();
             }
+        }
+
+        public async Task SendLog()
+        {
+            myCollection.SetStats(ChipsKeeper.Chips, Users.Count);
+            List<string> result = new List<string>();
+            foreach (string kriu in myCollection)
+            {
+                result.Add(kriu);
+            }
+            await Clients.Client(Context.ConnectionId).SendAsync("GetLog", result);
         }
     }
 }

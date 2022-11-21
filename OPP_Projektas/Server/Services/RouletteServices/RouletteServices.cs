@@ -1,11 +1,17 @@
-﻿namespace OPP_Projektas.Server.Services.RouletteServices
+﻿using OPP_Projektas.Shared.Models.Roulette.Iterator;
+
+namespace OPP_Projektas.Server.Services.RouletteServices
 {
     public class RouletteServices : IRouletteServices
     {
-        List<string> MessageLog { get; set; } = new List<string>();
-        public void SendLogToServer(string msg)
+        List<string> GainsMessageLog { get; set; } = new List<string>();
+
+
+        // realiai nebebus naudojama, bet uzkomentavus crashins,
+        // tai palieku
+        public void AddMessage(string msg)
         {
-            MessageLog.Add(msg);
+            GainsMessageLog.Add(msg);
             //Dabar paliekam pas save
             //Gal kada nors ir issiusim i serveri...
         }

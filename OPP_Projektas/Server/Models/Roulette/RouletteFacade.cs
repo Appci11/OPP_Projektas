@@ -20,7 +20,7 @@ namespace OPP_Projektas.Server.Models.Roulette
         {
             Random rand = new Random();
             rolledIndex = rand.Next(0, 36);
-            _rouletteServices.SendLogToServer(DateTime.Now.ToString() + " rolled index " + rolledIndex);
+            //_rouletteServices.SendLogToServer(DateTime.Now.ToString() + " rolled index " + rolledIndex);
             ChipMover = new RouletteChipMover(_users, rolledIndex);
             return rolledIndex;
         }
@@ -28,7 +28,7 @@ namespace OPP_Projektas.Server.Models.Roulette
         public int CalculateChips()
         {
             int chipsGained = ChipMover.DecideChipMovement();
-            _rouletteServices.SendLogToServer(DateTime.Now.ToString() + " Chips gained " + chipsGained);
+            _rouletteServices.AddMessage(DateTime.Now.ToString() + " Chips gained " + chipsGained);
             return chipsGained;
         }
 

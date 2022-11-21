@@ -1,7 +1,9 @@
-﻿namespace OPP_Projektas.Server.Services.RouletteServices
+﻿using OPP_Projektas.Shared.Models.Roulette.Iterator;
+
+namespace OPP_Projektas.Server.Services.RouletteServices
 {
     public interface IRouletteServices
     {
-        void SendLogToServer(string msg);
+        void AddMessage(string msg);
     }
 }

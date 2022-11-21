@@ -1,0 +1,21 @@
+﻿@page "/roulettelog"
+@inject State State
+@inject ILocalStorageService LocalStorage
+
+@if(State.RouletteLog != null)
+{
+    @foreach (var eil in State.RouletteLog)
+    {
+        <p>@eil</p>
+    }
+}
+else
+{
+    <p>Loading...</p>
+}
+
+
+@code {
+
+    public List<string>? Log { get; set; }
+}

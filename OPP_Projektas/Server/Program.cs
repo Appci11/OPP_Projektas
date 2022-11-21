@@ -17,7 +17,7 @@ builder.Services.AddResponseCompression(options =>
     .Concat(new[] { "application/octet-stream" })
 );
 //-----
-builder.Services.AddScoped<IRouletteServices, RouletteServices>();
+builder.Services.AddSingleton<IRouletteServices, RouletteServices>();
 
 var app = builder.Build();
 

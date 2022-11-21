@@ -10,7 +10,7 @@
 - [x] Builder – ne mažiau 2 “konkrečių builderių” (concrete builder).
 - [x] Adapter – Adapter ir Adaptee turi skirtingus metodų kiekius.
 - [x] Prototype – Palyginkite deep ir shallow kopijų sukūrimą, mokėti gynimo metu pakeisti realizaciją, ataskaitoje pateikite rezultatus - atminties adresus,
-- [ ] Decorator – nemažiau 3 dekoravimo lygių,
+- [x] Decorator – nemažiau 3 dekoravimo lygių,
 - [x] Command – prie komandų turi būti undo() galimybė,
 - [x] Façade – ne mažiau 2 “client” klasių ir nemažiau 3 “subsystem” klasių.
 - [x] Bridge – ne mažiau 2 abstrakcijų ir nemažiau 2 konkrečių realizacijų, paaiškinti skirtumą su Strategy ir Adapter šablonais.

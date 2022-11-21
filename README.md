@@ -10,7 +10,7 @@
 - [x] Builder – ne mažiau 2 “konkrečių builderių” (concrete builder).
 - [x] Adapter – Adapter ir Adaptee turi skirtingus metodų kiekius.
 - [x] Prototype – Palyginkite deep ir shallow kopijų sukūrimą, mokėti gynimo metu pakeisti realizaciją, ataskaitoje pateikite rezultatus - atminties adresus,
-- [ ] Decorator – nemažiau 3 dekoravimo lygių,
+- [x] Decorator – nemažiau 3 dekoravimo lygių,
 - [x] Command – prie komandų turi būti undo() galimybė,
 - [x] Façade – ne mažiau 2 “client” klasių ir nemažiau 3 “subsystem” klasių.
 - [x] Bridge – ne mažiau 2 abstrakcijų ir nemažiau 2 konkrečių realizacijų, paaiškinti skirtumą su Strategy ir Adapter šablonais.
@@ -18,7 +18,7 @@
 ## 2 dalis. Specifiniai reikalavimai šablonams
 
 - [ ] Template method – ne mažiau 2 konkrečių klasių (final arba seal).
-- [ ] Iterator – iteruojama (atliekami interfeiso veiksmai) per skirtingas duomenų struktūras – ne mažiau 3 klasių.
+- [ ] Iterator – iteruojama (atliekami interfeiso veiksmai) per skirtingas duomenų struktūras – ne mažiau 3 klasių. **WIP**
 - [ ] Flyweight – Atlikti greitaveikos bei naudojamos atminties matavimus,
 - [ ] Composite – gynimo metu pakeisti realizaciją (visibility arba safetiness), paaiškinti skirtumą nuo Decorator
 - [ ] State – būsenų diagrama – ne mažiau 4 būsenų, paaiškinti skirtumą nuo Strategy,

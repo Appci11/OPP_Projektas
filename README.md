@@ -18,7 +18,7 @@
 ## 2 dalis. Specifiniai reikalavimai šablonams
 
 - [ ] Template method – ne mažiau 2 konkrečių klasių (final arba seal).
-- [ ] Iterator – iteruojama (atliekami interfeiso veiksmai) per skirtingas duomenų struktūras – ne mažiau 3 klasių. **WIP**
+- [x] Iterator – iteruojama (atliekami interfeiso veiksmai) per skirtingas duomenų struktūras – ne mažiau 3 klasių.
 - [ ] Flyweight – Atlikti greitaveikos bei naudojamos atminties matavimus,
 - [ ] Composite – gynimo metu pakeisti realizaciją (visibility arba safetiness), paaiškinti skirtumą nuo Decorator
 - [ ] State – būsenų diagrama – ne mažiau 4 būsenų, paaiškinti skirtumą nuo Strategy,

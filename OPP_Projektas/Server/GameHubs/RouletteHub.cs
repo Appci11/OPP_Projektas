@@ -3,6 +3,7 @@
 
 using Microsoft.AspNetCore.SignalR;
 using OPP_Projektas.Server.Models.Roulette;
+using OPP_Projektas.Shared.Models.Chat;
 using OPP_Projektas.Shared.Models.Roulette;
 
 namespace OPP_Projektas.Server.GameHubs
@@ -37,7 +38,15 @@ namespace OPP_Projektas.Server.GameHubs
             string username = Users.FirstOrDefault(u => u.GameId == Context.ConnectionId).Username;
             await AddConnectionStatusMsg($"{username} left the game!");
             //Users.Remove(Context.ConnectionId);
+            int index = Users.FindIndex(u => u.GameId == Context.ConnectionId);
+            Users.RemoveAt(index);
             await Clients.All.SendAsync("GetPlayerCount", Users.Count);
+            await Clients.All.SendAsync("GetBetsPlacedCount", betsCount);
+            
+            if (betsCount >= Users.Count)
+            {
+                await RollANumber();
+            }
         }
 
         public async Task AddConnectionStatusMsg(string message)
@@ -95,7 +104,8 @@ namespace OPP_Projektas.Server.GameHubs
         {
             foreach (RouletteUser user in Users)
             {
-                await Clients.All.SendAsync("GetWinnings", user.Winnings);
+                await Clients.Client(user.GameId).SendAsync("GetWinnings", user.Winnings);
+                Console.WriteLine();
             }
         }
     }

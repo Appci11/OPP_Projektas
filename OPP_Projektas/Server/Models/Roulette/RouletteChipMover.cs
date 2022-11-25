@@ -1,6 +1,6 @@
 ﻿using OPP_Projektas.Shared.Models.Roulette;
-using System;
-using System.Linq.Expressions;
+using OPP_Projektas.Server.Models.Roulette.Visitor;
+
 
 namespace OPP_Projektas.Server.Models.Roulette
 {
@@ -33,13 +33,20 @@ namespace OPP_Projektas.Server.Models.Roulette
 
             foreach (RouletteUser user in _users)
             {
+                IComponent component = new ConcreteComponent(user.BetAmmount);
+
                 switch (user.BetType)
                 {
+                    // nepraziopsot, kad tarkim jei laimi 2:1 tai:
+                    // zaidejui suma padvigubeja
+                    // stalas praranda 1, del to atimt statyma is sk
                     case 3:
                         if (user.BetValue == winningColourValue)
                         {
-                            chipsGained -= user.BetAmmount;
-                            user.Winnings = user.BetAmmount * 2;
+                            IVisitor visitor1 = new VisitorBetOnColor();
+                            int sk = Visitor.Client.ClientCode(component, visitor1);
+                            chipsGained -= sk - user.BetAmmount;
+                            user.Winnings = sk;
                         }
                         else
                         {
@@ -50,8 +57,10 @@ namespace OPP_Projektas.Server.Models.Roulette
                     case 2:
                         if (user.BetValue == winningThird)
                         {
-                            chipsGained -= user.BetAmmount * 2;
-                            user.Winnings = user.BetAmmount * 3;
+                            IVisitor visitor2 = new VisitorBetOnThird();
+                            int sk = Visitor.Client.ClientCode(component, visitor2);
+                            chipsGained -= sk - user.BetAmmount;
+                            user.Winnings = sk;
                         }
                         else
                         {
@@ -62,8 +71,10 @@ namespace OPP_Projektas.Server.Models.Roulette
                     default:
                         if (user.BetValue == winningNumber)
                         {
-                            chipsGained -= user.BetAmmount * 32;
-                            user.Winnings = user.BetAmmount * 33;
+                            IVisitor visitor3 = new VisitorBetOnNumber();
+                            int sk = Visitor.Client.ClientCode(component, visitor3);
+                            chipsGained -= sk - user.BetAmmount;
+                            user.Winnings = sk;
                         }
                         else
                         {
@@ -73,7 +84,6 @@ namespace OPP_Projektas.Server.Models.Roulette
                         break;
                 }
             }
-            Console.WriteLine();
             return chipsGained;
         }
     }

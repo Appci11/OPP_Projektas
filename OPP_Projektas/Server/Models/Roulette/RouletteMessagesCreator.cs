@@ -8,14 +8,16 @@
         {
             Messages = new List<string>();
             int bigWin = 0;
+            int betAmm = 0;
             foreach(RouletteUser user in users)
             {
                 if(user.Winnings > bigWin)
                 {
                     bigWin = user.Winnings;
+                    betAmm = user.BetAmmount;
                 }
             }
-            Messages.Add($"Greatest winning: {bigWin / 2}");
+            Messages.Add($"Greatest winning: {bigWin - betAmm}");
             return Messages;
         }
 

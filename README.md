@@ -24,7 +24,7 @@
 - [ ] State – būsenų diagrama – ne mažiau 4 būsenų, paaiškinti skirtumą nuo Strategy,
 - [ ] Proxy – gynimo metu pakeisti realizaciją (security, added functionality, delayed creation). Ataskaitoje pateikti šablono veikimo greitaveikos ir atminties naudojimo rezultatus.
 - [ ] Chain Of Responsibility – grandinėlė ne trumpesnė nei iš 4 elementų.
-- [ ] Visitor – ne mažiau 3 visitor klasių.
+- [ ] Visitor – ne mažiau 3 visitor klasių. **WIP**
 - [ ] Interpreter - panaudojimas komandoms per concole.
 - [ ] Mediator – parodyti tarpininkavimą tarp mažiausiai 3 skirtingų klasių, mokėti paaiškinti skirtumą su Observer.
 - [ ] Memento – Saugus “secure” duomenų atstatymas, kad kitos klasės negautų prieigos prie duomenų.

@@ -66,20 +66,48 @@ namespace OPP_Projektas.Server.GameHubs
             await Clients.All.SendAsync("GetPlayerCount", Users.Count);
         }
 
-        public async Task PlaceABetRed(int BetAmmount)
+        public async Task PlaceABetRed(int BetAmmount, int betValue)
         {
             Users.FirstOrDefault(u => u.GameId == Context.ConnectionId).BetAmmount = BetAmmount;
             Users.FirstOrDefault(u => u.GameId == Context.ConnectionId).Bet = "Red";
+            Users.FirstOrDefault(u => u.GameId == Context.ConnectionId).BetType = 3;
+            Users.FirstOrDefault(u => u.GameId == Context.ConnectionId).BetValue = betValue;
             await Clients.All.SendAsync("GetBetsPlacedCount", ++betsCount);
             if (betsCount >= Users.Count)
             {
                 await RollANumber();
             }
         }
-        public async Task PlaceABetBlack(int BetAmmount)
+        public async Task PlaceABetBlack(int BetAmmount, int betValue)
         {
             Users.FirstOrDefault(u => u.GameId == Context.ConnectionId).BetAmmount = BetAmmount;
             Users.FirstOrDefault(u => u.GameId == Context.ConnectionId).Bet = "Black";
+            Users.FirstOrDefault(u => u.GameId == Context.ConnectionId).BetType = 3;
+            Users.FirstOrDefault(u => u.GameId == Context.ConnectionId).BetValue = betValue;
+            await Clients.All.SendAsync("GetBetsPlacedCount", ++betsCount);
+            if (betsCount >= Users.Count)
+            {
+                await RollANumber();
+            }
+        }
+
+        public async Task PlaceABetThird(int BetAmmount, int betValue)
+        {
+            Users.FirstOrDefault(u => u.GameId == Context.ConnectionId).BetAmmount = BetAmmount;
+            Users.FirstOrDefault(u => u.GameId == Context.ConnectionId).BetType = 2;
+            Users.FirstOrDefault(u => u.GameId == Context.ConnectionId).BetValue = betValue;
+            await Clients.All.SendAsync("GetBetsPlacedCount", ++betsCount);
+            if (betsCount >= Users.Count)
+            {
+                await RollANumber();
+            }
+        }
+
+        public async Task PlaceABetNumber(int BetAmmount, int betValue)
+        {
+            Users.FirstOrDefault(u => u.GameId == Context.ConnectionId).BetAmmount = BetAmmount;
+            Users.FirstOrDefault(u => u.GameId == Context.ConnectionId).BetType = 1;
+            Users.FirstOrDefault(u => u.GameId == Context.ConnectionId).BetValue = betValue;
             await Clients.All.SendAsync("GetBetsPlacedCount", ++betsCount);
             if (betsCount >= Users.Count)
             {

@@ -32,10 +32,25 @@ else
     <br />
     if (!betPlaced)
     {
+        <div class="pad10">
+            <input id="betAmmount" @bind="BetAmmount" type="number" aria-label="Bet Ammount:" />
+            <label for="betAmmount">Bet Ammount</label>
+
+        </div class="pad10">
         <div>
-            <input @bind="BetAmmount" type="number" aria-label="Bet Ammount:" />
-            <button class="btn btn-primary" @onclick="PlaceABetRed">Bet Red</button>
-            <button class="btn btn-primary" @onclick="PlaceABetBlack">Bet Black</button>
+            <input id="betNumber" @bind="BetNumber" type="number" aria-label="Bet on Number:" />
+            <label for="betNumber">Number to Bet On</label>
+            <button class="btn btn-primary" @onclick="() => PlaceABetNumber(BetNumber)">Bet On Selected Number</button>
+
+        </div>
+        <div class="pad10">
+            <button class="btn btn-primary" @onclick="() => PlaceABetThird(1)">Bet 1-12</button>
+            <button class="btn btn-primary" @onclick="() => PlaceABetThird(2)">Bet 13-24</button>
+            <button class="btn btn-primary" @onclick="() => PlaceABetThird(3)">Bet 25-32</button>
+        </div>
+        <div class="pad10">
+            <button class="btn btn-primary" @onclick="() => PlaceABetRed(1)">Bet Red</button>
+            <button class="btn btn-primary" @onclick="() => PlaceABetBlack(2)">Bet Black</button>
         </div>
     }
     <br />
@@ -70,7 +85,7 @@ else
     private int RolledNumberIndex = 0;
     private bool betPlaced = false;
     int BetAmmount = 1;
-    //private int[] ChipAmmounts { get; set; } = { -1, -1, -1, -1, -1, -1 };
+    int BetNumber = 0;
     private List<string> messages = new List<string>();
 
     bool hide = true;
@@ -134,34 +149,50 @@ else
 
         hubConnection.On<List<string>>("GetLog", (Log) =>
         {
-            foreach(string eil in Log)
-            {
-                global::System.Console.WriteLine(eil);
-            }
             State.RouletteLog = Log;
-            global::System.Console.WriteLine("asd");
+            StateHasChanged();  // kai visad naujam lange bus atidaroma nebereikes.
         });
 
-
-        //by default reikia, ne savo isgalvota
         await hubConnection.StartAsync();
     }
 
-    private async Task PlaceABetRed()
+    private async Task PlaceABetRed(int value)
     {
         if (hubConnection != null)
         {
-            await hubConnection.SendAsync("PlaceABetRed", BetAmmount);
+            await hubConnection.SendAsync("PlaceABetRed", BetAmmount, value);
             betPlaced = true;
             Keeper.RemoveChips(BetAmmount);
             NewKeeper.Chips = Adapter.GetChips();
         }
     }
-    private async Task PlaceABetBlack()
+    private async Task PlaceABetBlack(int value)
     {
         if (hubConnection != null)
         {
-            await hubConnection.SendAsync("PlaceABetBlack", BetAmmount);
+            await hubConnection.SendAsync("PlaceABetBlack", BetAmmount, value);
+            betPlaced = true;
+            Keeper.RemoveChips(BetAmmount);
+            NewKeeper.Chips = Adapter.GetChips();
+        }
+    }
+
+    private async Task PlaceABetThird(int value)
+    {
+        if (hubConnection != null)
+        {
+            await hubConnection.SendAsync("PlaceABetThird", BetAmmount, value);
+            betPlaced = true;
+            Keeper.RemoveChips(BetAmmount);
+            NewKeeper.Chips = Adapter.GetChips();
+        }
+    }
+
+        private async Task PlaceABetNumber(int value)
+    {
+        if (hubConnection != null)
+        {
+            await hubConnection.SendAsync("PlaceABetNumber", BetAmmount, value);
             betPlaced = true;
             Keeper.RemoveChips(BetAmmount);
             NewKeeper.Chips = Adapter.GetChips();
@@ -178,6 +209,7 @@ else
     }
     private async Task OpenRouletteLog()
     {
+        // pasiieskot kaip naujam lange visad atidaryt
         NavigationManager.NavigateTo("/roulettelog");
     }
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using OPP_Projektas.Server.Models.Chat.Command;
+using OPP_Projektas.Server.Models.Chat.Memento;
 using OPP_Projektas.Shared.Models.Chat;
 
 namespace OPP_Projektas.Server.GameHubs
@@ -12,6 +13,11 @@ namespace OPP_Projektas.Server.GameHubs
         static Receiver receiver = new Receiver(Messages);
 
 
+        //static List<string> Messages = new List<string>();
+        static Originator originator = new Originator(Messages);
+        static Caretaker caretaker = new Caretaker(originator);
+
+        static int n = 0;
 
         public override async Task OnConnectedAsync()
         {
@@ -31,6 +37,14 @@ namespace OPP_Projektas.Server.GameHubs
         public async Task AddMessageToChat(string user, string message)
         {
             Message msg = new Message(user, message);   //reiktu front'o callus keist...
+            originator._messages.Add(msg);
+
+            Console.WriteLine("Originator Messages:");
+            foreach (var mmm in originator._messages)
+            {
+                Console.WriteLine(mmm.Username + " " + mmm.Msg);
+            }
+
             ModifyMessages.SetCommand(new ImplementedCommands(receiver, CommandsEnum.Add, msg));
             ModifyMessages.Invoke();
             await Clients.All.SendAsync("ReceiveMessages", Messages);
@@ -45,6 +59,21 @@ namespace OPP_Projektas.Server.GameHubs
         public async Task RedoAction()
         {
             ModifyMessages.RedoAction();
+            await Clients.All.SendAsync("ReceiveMessages", Messages);
+        }
+
+        public async Task SaveMemento()
+        {
+            caretaker.Backup("Save1"); // galima ir pakeist save pavadinima netingint...
+            Messages.Add(new Message("System", "Messages Saved"));
+            await Clients.Client(Context.ConnectionId).SendAsync("GetMementosCount", 777);
+            await Clients.All.SendAsync("ReceiveMessages", Messages);            
+        }
+        public async Task LoadMemento(int i)
+        {
+            caretaker.Load(i);
+            Messages = originator._messages.ToList<Message>();
+            receiver = new Receiver(Messages);
             await Clients.All.SendAsync("ReceiveMessages", Messages);
         }
     }

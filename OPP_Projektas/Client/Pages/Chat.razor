@@ -30,8 +30,14 @@ else
             Send
         </button>
     </div>
+@*
     <button class="btn btn-secondary" @onclick="Undo"disabled="@(!IsConnected)">Undo</button>
     <button class="btn btn-secondary" @onclick="Redo"disabled="@(!IsConnected)">Redo</button>
+*@
+    <button class="btn btn-secondary" @onclick="SaveMemento" disabled="@(!IsConnected)">Save</button>
+    @*<button class="btn btn-secondary" @onclick="() => LoadMemento(0)" disabled="@(!IsConnected)">Load</button>*@
+    <button class="btn btn-secondary" @onclick="LoadMemento" disabled="@(!IsConnected)">Load</button>
+
 }
 
 @code {
@@ -59,6 +65,13 @@ else
             }
             //sad
             JSRuntime.InvokeVoidAsync("scrollToBottom", TextAreaRef);
+            StateHasChanged();
+        });
+
+        hubConnection.On<int>("GetMementosCount", (count) =>
+        {
+            int sk = count;
+            Console.WriteLine("Memento count: " + sk);
             StateHasChanged();
         });
 
@@ -106,6 +119,24 @@ else
         if (hubConnection != null)
         {
             await hubConnection.DisposeAsync();
+        }
+    }
+
+    private async Task SaveMemento()
+    {
+        if (hubConnection != null)
+        {
+            await hubConnection.SendAsync("SaveMemento");
+        }
+    }
+    private async Task LoadMemento()
+    {
+        if (hubConnection != null)
+        {
+            // 0 nurodo save nr
+            // turint laiko ir noro galima UI pakeist taip, kad eitu matyt save kieki
+            // ir nurodyt kelinta norim uzkraut
+            await hubConnection.SendAsync("LoadMemento", 0);
         }
     }
 }

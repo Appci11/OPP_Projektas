@@ -6,9 +6,9 @@ namespace OPP_Projektas.Server.Models.Chat.Command
     {
         public List<Message> Messages { get; set; }
 
-        public Receiver(List<Message> kazkas)
+        public Receiver(List<Message> messages)
         {
-            this.Messages = kazkas;
+            this.Messages = messages;
         }
 
         public void AddMessage(Message message)

@@ -1,6 +1,4 @@
-﻿using Xunit;
-using Bunit;
-using OPP_Projektas.Client.Pages;
+﻿using OPP_Projektas.Client.Pages;
 
 namespace UnitTests
 {

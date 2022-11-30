@@ -10,6 +10,7 @@ namespace OPP_Projektas.Server.Models.Roulette
         private readonly int _winningIndex;
         Wheel Wheel = new Wheel();
 
+        //galejo but ir enum, bet tingiu
         int winningNumber = 0;
         int winningThird = 0;
         int winningColourValue = 0;
@@ -27,8 +28,8 @@ namespace OPP_Projektas.Server.Models.Roulette
             if (string.Compare(winningColour, "Red") == 0) { winningColourValue = 1; }
             else { winningColourValue = 2; }
             winningNumber = Wheel.WheelNumbers[_winningIndex].Number;
-            if (winningNumber >= 0 && winningNumber <= 12) winningThird = 1;  //nesamone
-            if (winningNumber >= 13 && winningNumber <= 24) winningThird = 2;//bet tingiu
+            if (winningNumber >= 0 && winningNumber <= 12) winningThird = 1;  //3 if nesamone
+            if (winningNumber >= 13 && winningNumber <= 24) winningThird = 2;//bet tingiu saziningai daryt
             if (winningNumber >= 25) winningThird = 3;
 
             foreach (RouletteUser user in _users)

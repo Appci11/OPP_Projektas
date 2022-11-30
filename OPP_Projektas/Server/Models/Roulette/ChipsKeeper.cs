@@ -15,5 +15,10 @@
         {
             Record.Add(number);
         }
+
+        public List<int> GetRecord()
+        {
+            return Record;
+        }
     }
 }

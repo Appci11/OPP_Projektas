@@ -1,6 +1,4 @@
-﻿using Xunit;
-using Bunit;
-using OPP_Projektas.Shared.Models.Roulette;
+﻿using OPP_Projektas.Shared.Models.Roulette;
 
 namespace UnitTests
 {

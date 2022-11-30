@@ -29,13 +29,13 @@ namespace OPP_Projektas.Shared.Models.Roulette.Iterator
                     return _casinoStats[0];
                 return _casinoStats[1];
             }
-
-            if (_count >= position + 2)
+            // Log dalis
+            if (position < nLog)
             {
                 return _collection[position];
             }
             int n = _count - position;
-            string eil = _uniqueUsers.ElementAt(n - 1);
+            string eil = "User1";
             return eil;
         }
 

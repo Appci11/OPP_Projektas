@@ -1,6 +1,6 @@
 ﻿using OPP_Projektas.Client.Models.Roulette;
 
-namespace UnitTests
+namespace UnitTests.RouletteClient
 {
     public class ChipsAdapterShould
     {

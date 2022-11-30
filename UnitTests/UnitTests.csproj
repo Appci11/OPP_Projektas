@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OPP_Projektas\Client\OPP_Projektas.Client.csproj" />
+    <ProjectReference Include="..\OPP_Projektas\Server\OPP_Projektas.Server.csproj" />
   </ItemGroup>
 
 </Project>

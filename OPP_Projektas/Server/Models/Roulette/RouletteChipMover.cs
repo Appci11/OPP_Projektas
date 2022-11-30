@@ -56,6 +56,7 @@ namespace OPP_Projektas.Server.Models.Roulette
                         }
                         break;
                     case 2:
+                        //throw new Exception($"winningIndex = {_winningIndex}");
                         if (user.BetValue == winningThird)
                         {
                             IVisitor visitor2 = new VisitorBetOnThird();

@@ -1,10 +1,10 @@
 ﻿using OPP_Projektas.Client.Models.Roulette;
 
-namespace UnitTests
+namespace UnitTests.RouletteClient
 {
     public class NewChipsKeeperShould
     {
-        
+
         [Fact]
         public void SetsCorrectValueOnDefaultConstructor()
         {
@@ -12,7 +12,7 @@ namespace UnitTests
             NewChipsKeeper keeper = new NewChipsKeeper();
             // Act
             int[] arr = keeper.Chips;
-            
+
             // Assert
             Assert.Equal(expected: 0, actual: arr[0]);
             Assert.Equal(expected: 0, actual: arr[1]);

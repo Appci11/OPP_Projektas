@@ -9,8 +9,8 @@ namespace OPP_Projektas.Shared.Models.State
 {
     public abstract class SlotMachineState
     {
-        protected FlyweightFactory FlyweightFactory;
-        protected List<Flyweight> AllFireworks;
+        protected FireworksFactory FlyweightFactory;
+        protected List<FireworksType> AllFireworks;
         protected List<NotFlyweight> AllFireworksNFW;
 
         /*public void SetFlyweightFactory(FlyweightFactory flyweightFactory)
@@ -21,21 +21,21 @@ namespace OPP_Projektas.Shared.Models.State
         }*/
         public SlotMachineState()
         {
-            FlyweightFactory = new FlyweightFactory();
-            AllFireworks = new List<Flyweight>();
+            FlyweightFactory = new FireworksFactory();
+            AllFireworks = new List<FireworksType>();
             AllFireworksNFW = new List<NotFlyweight>();
         }
-        public void SetContext(FlyweightFactory flyweightFactory, List<Flyweight> allFireworks, List<NotFlyweight> allFireworksNFW)
+        public void SetContext(FireworksFactory flyweightFactory, List<FireworksType> allFireworks, List<NotFlyweight> allFireworksNFW)
         {
             FlyweightFactory = flyweightFactory;
             AllFireworks = allFireworks;
             AllFireworksNFW = allFireworksNFW;
         }
-        public FlyweightFactory GetFlyweightFactory()
+        public FireworksFactory GetFlyweightFactory()
         {
             return FlyweightFactory;
         }
-        public List<Flyweight> GetAllFireworks()
+        public List<FireworksType> GetAllFireworks()
         {
             return AllFireworks;
         }

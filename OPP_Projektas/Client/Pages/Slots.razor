@@ -36,38 +36,26 @@
 </div>
 </div>
     @{
-        
+
         if(slotMachineState is WinBigState || slotMachineState is WinSmallState){
+
             if (useFlyweightFireworks) // flyweight
             { 
                 slotMachineState.CreateFirworks();
-                List<Flyweight> fireworksToDisplay = slotMachineState.GetAllFireworks();
+                List<FireworksType> fireworksToDisplay = slotMachineState.GetAllFireworks();
                 Random rand = new Random();
-                foreach (Flyweight firework in fireworksToDisplay) 
+                foreach (FireworksType firework in fireworksToDisplay) 
                 {
-                    int choice = rand.Next(3);
-                    string url = "";
-                    switch (choice)
-                    {
-                        case 0:
-                            url = "assets/fireworks1.gif";
-                            break;
-                        case 1:
-                            url = "assets/fireworks2.gif";
-                            break;
-                        case 2:
-                            url = "assets/fireworks3.gif";
-                            break;
-                        default:
-                            url = "assets/fireworks4.gif";
-                            break;
-                    }
-                    @((MarkupString)firework.GetImage(url))
-                    ;
+                    int top = rand.Next(100);
+                    int bottom = rand.Next(100);
+                    int left = rand.Next(100);
+                    int right = rand.Next(100);
+
+                    @((MarkupString)firework.GetImage(top, bottom, left, right));
                 }
             }
-            else
-            { // not flyweight
+            else // not flyweight
+            { 
                 slotMachineState.CreateFirworksNFW();
                 List<NotFlyweight> fireworksToDisplay = slotMachineState.GetAllFireworksNFW();
                 foreach (NotFlyweight firework in fireworksToDisplay) 
@@ -164,7 +152,7 @@
     public SlotType SlotType { get; set; } = SlotType.Simple;
 
     SlotMachineState slotMachineState = new IdleState();
-    bool useFlyweightFireworks =false;
+    bool useFlyweightFireworks =true;
 
     
     protected override async Task OnInitializedAsync()

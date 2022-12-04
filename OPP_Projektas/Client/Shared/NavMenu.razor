@@ -66,21 +66,21 @@
         switch (ii)
         {
             case 0:
-                borderDesign = new BorderSize("12px");
+                borderDesign = new BorderWidth("12px");
                 var HDD = new HalloweenDesignDecorator(borderDesign);
                 Console.WriteLine("decorator.Decorate(): " + HDD.Decorate(""));
                 borderStyle = HDD.Decorate("");
                 ii++;
                 break;
             case 1:
-                borderDesign = new BorderSize("12px");
+                borderDesign = new BorderWidth("12px");
                 var CDD = new ChristmasDesignDecorator(borderDesign);
                 Console.WriteLine("borderDesign.Decorate(): " + CDD.Decorate(""));
                 borderStyle = CDD.Decorate("");
                 ii++;
                 break;
             case 2:
-                borderDesign = new BorderSize("12px");
+                borderDesign = new BorderWidth("12px");
                 var EDD = new EasterDesignDecorator(borderDesign);
                 Console.WriteLine("borderDesign.Decorate(): " + EDD.Decorate(""));
                 borderStyle = EDD.Decorate("");

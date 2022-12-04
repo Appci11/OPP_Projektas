@@ -6,6 +6,7 @@
 @using OPP_Projektas.Shared.Models.Slots.SlotSymbols
 @using OPP_Projektas.Shared.Models.Slots.SlotSymbols.Rollers
 @using OPP_Projektas.Shared.Models.Styles
+@using OPP_Projektas.Shared.Models.Flyweight;
 @inject NavigationManager NavigationManager
 
 <PageTitle>Slots</PageTitle>
@@ -13,7 +14,6 @@
 <div style="display:flex">
 <div>
 <h1>Slots</h1>
-
 
 
 <input @bind="Name" />
@@ -34,6 +34,37 @@
     </table>
 </div>
 </div>
+    @{
+        if(needFireworks){
+
+            Random rand = new Random();
+            for(int i = 0;i<allFireworks.Count;i++){ // flyweight
+                int choice = rand.Next(3);
+                string url = "";
+                switch(choice){
+                    case 0:
+                        url = "assets/fireworks1.gif";
+                        break;
+                    case 1:
+                        url = "assets/fireworks2.gif";
+                        break;
+                    case 2:
+                        url = "assets/fireworks3.gif";
+                        break;
+                    default:
+                        url = "assets/fireworks4.gif";
+                        break;
+                }
+                @((MarkupString)allFireworks[i].GetImage(url));
+            }
+            DeleteFireworks();
+            /*for (int i = 0; i < allFireworksNFW.Count; i++) // not flyweight
+            {
+                @((MarkupString)allFireworksNFW[i].GetImage());
+            }
+            DeleteFireworksNFW();*/
+    }
+}
     <div style="margin: 50px">
         <h2>REWARDS:</h2>
         @if (!IsPictureSymbols)
@@ -117,6 +148,12 @@
     public ISlotsMachineStyle SlotsMachineStyle { get; set; }
     public SlotType SlotType { get; set; } = SlotType.Simple;
 
+    bool needFireworks = false;
+    FlyweightFactory flyweightFactory = new FlyweightFactory();
+    //List<RenderFragment> allFireworks = new List<RenderFragment>();
+    List<Flyweight> allFireworks = new List<Flyweight>();
+    List<NotFlyweight> allFireworksNFW = new List<NotFlyweight>();
+
     protected override async Task OnInitializedAsync()
     {
         SlotsMachineStyle = _style.CreateSlotsMachineStyle();
@@ -136,9 +173,6 @@
         hubConnection.On<Tuple<int, List<SymbolTier>>>("Something", async (resultEnum) =>
         {
             Console.WriteLine("Tester2");
-            Console.WriteLine("resultEnum.Item1 (Payout): " + resultEnum.Item1);
-            Console.WriteLine("resultEnum.Item2.Count (SymbolTier.Count): " + resultEnum.Item2.Count);
-
             SlotsResult result;
             List<ISymbolTier> tiers = new List<ISymbolTier>();
             foreach (SymbolTier tier in resultEnum.Item2)
@@ -164,28 +198,19 @@
             }
 
             result = new SlotsResult(tiers, resultEnum.Item1);
-            Console.WriteLine("result.Payout: "+result.Payout);
-            Console.WriteLine("result.SlotSymbols.Count: " + result.SlotSymbols.Count);
 
             SlotRoller fakeResultRoller;
-            Console.WriteLine("Tester3");
             fakeResultRoller = IsPictureSymbols ? new PictureSlotRoller() : new ColorSlotRoller();
-            Console.WriteLine("trying to get result properties:");
-            Console.WriteLine("result.Payout: "+result.Payout.ToString());
-            Console.WriteLine("result.SlotSymbols.Count: "+result.SlotSymbols.Count);
-            Console.WriteLine("Tester4");
             List<ISlotSymbol> resultingSymbols = new List<ISlotSymbol> { fakeResultRoller.CreateSymbol(result.SlotSymbols[0]), fakeResultRoller.CreateSymbol(result.SlotSymbols[1]), fakeResultRoller.CreateSymbol(result.SlotSymbols[2]) };
-            Console.WriteLine("at rand");
             Random rand = new Random();
             for(int i = 0;i<3;i++){
-                Console.WriteLine("at first for");
                 int switchingAmount = 30;
                 if(i>0){
                     switchingAmount /= 2;
                 }
+
                 for (int j = 0; j < switchingAmount; j++)
                 {
-                    Console.WriteLine("at second for");
                     switch(i){
                         case 0:
                             Results = new List<ISlotSymbol> { fakeResultRoller.CreateSymbol(rand.Next(0, 5)), fakeResultRoller.CreateSymbol(rand.Next(0, 5)), fakeResultRoller.CreateSymbol(rand.Next(0, 5)) };
@@ -197,17 +222,14 @@
                             Results = new List<ISlotSymbol> { Results[0], Results[1], fakeResultRoller.CreateSymbol(rand.Next(0, 5)) };
                             break;
                     }
-                    Console.WriteLine("at delay");
                     await Task.Delay(50);
-                    Console.WriteLine("at invoke");
                     await InvokeAsync(StateHasChanged);
                 }
-                Console.WriteLine("at Results[i]");
                 Results[i] = fakeResultRoller.CreateSymbol(result.SlotSymbols[i]);
             }
 
             Balance += result.Payout;
-            if (result.Payout > 150)
+            if (result.Payout > 1)
             {
                 await hubConnection.SendAsync("BroadcastWin", Name, result.Payout);
             }
@@ -237,15 +259,25 @@
             await InvokeAsync(StateHasChanged);
         });
 
-        hubConnection.On<string>("WinBroadcasted", (result) =>
+        hubConnection.On<string>("WinBroadcasted", async(result) =>
         {
             Messages.Insert(0, result);
-            InvokeAsync(StateHasChanged);
+            await InvokeAsync(StateHasChanged);
+            for (int i = 0; i < 1000;i++){
+                allFireworks.Add(CreateFireworks());
+            }
+            /*for (int i = 0; i < 1000; i++)
+            {
+                allFireworksNFW.Add(CreateFireworksNFW());
+            }*/
+            needFireworks = true;
+            await InvokeAsync(StateHasChanged);
         });
 
         await hubConnection.StartAsync();
         Console.WriteLine("Connection established");
     }
+
 
     private async Task Play()
     {
@@ -365,5 +397,60 @@
             }
         }
         throw new ArgumentOutOfRangeException(nameof(type));
+    }
+    private Flyweight CreateFireworks(){
+        Random rand = new Random();
+        int top = rand.Next(100);
+        int bottom = rand.Next(100);
+        int left = rand.Next(100);
+        int right = rand.Next(100);
+
+        Fireworks fireworks = new Fireworks(top, bottom, left, right);
+
+        return flyweightFactory.GetFlyweight(fireworks);
+    }
+    private NotFlyweight CreateFireworksNFW()
+    {
+        Random rand = new Random();
+        int top = rand.Next(100);
+        int bottom = rand.Next(100);
+        int left = rand.Next(100);
+        int right = rand.Next(100);
+
+        Fireworks fireworks = new Fireworks(top, bottom, left, right);
+
+        int choice = rand.Next(3);
+        string url = "";
+        switch (choice)
+        {
+            case 0:
+                url = "assets/fireworks1.gif";
+                break;
+            case 1:
+                url = "assets/fireworks2.gif";
+                break;
+            case 2:
+                url = "assets/fireworks3.gif";
+                break;
+            default:
+                url = "assets/fireworks4.gif";
+                break;
+        }
+
+        return new NotFlyweight(fireworks, url);
+    }
+    private async void DeleteFireworks()
+    {
+        await Task.Delay(3000);
+        allFireworks.Clear();
+        needFireworks = false;
+        await InvokeAsync(StateHasChanged);
+    }
+    private async void DeleteFireworksNFW()
+    {
+        await Task.Delay(3000);
+        allFireworksNFW.Clear();
+        needFireworks = false;
+        await InvokeAsync(StateHasChanged);
     }
 }

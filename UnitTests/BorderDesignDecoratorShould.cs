@@ -8,7 +8,7 @@ using Xunit.Sdk;
 
 namespace UnitTests
 {
-    public class BorderDesignDecoratorTests
+    public class BorderDesignDecoratorShould
     {
         BorderDesign borderDesign;
 

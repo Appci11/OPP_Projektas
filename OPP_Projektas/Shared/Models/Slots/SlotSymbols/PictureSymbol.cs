@@ -35,11 +35,29 @@ public class PictureSymbol : ISlotSymbol
     }
     public ISlotSymbol ShallowClone()
     {
-        var original = this;
-        return original;
+        //return (PictureSymbol)this.MemberwiseClone();
+        return this;
     }
     public ISlotSymbol DeepClone()
     {
-        return new PictureSymbol(this);
+        var clone = (PictureSymbol)this.MemberwiseClone();
+        switch (SymbolTier){
+            case TierFirst:
+                clone.SymbolTier = new TierFirst();
+                break;
+            case TierSecond:
+                clone.SymbolTier = new TierSecond();
+                break;
+            case TierThird:
+                clone.SymbolTier = new TierThird();
+                break;
+            case TierFourth:
+                clone.SymbolTier = new TierFourth();
+                break;
+            case TierFifth:
+                clone.SymbolTier = new TierFifth();
+                break;
+        }
+        return clone;
     }
 }

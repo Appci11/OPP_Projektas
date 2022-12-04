@@ -11,7 +11,6 @@ public class ColorSymbol : ISlotSymbol
     }
     public ColorSymbol(ISymbolTier tier)
     {
-        Console.WriteLine("i is in color symbol constructor");
         this.SymbolTier = tier;
     }
     public string Render()
@@ -34,11 +33,30 @@ public class ColorSymbol : ISlotSymbol
     }
     public ISlotSymbol ShallowClone()
     {
-        var original = this;
-        return original;
+        //return (ColorSymbol)this.MemberwiseClone();
+        return this;
     }
     public ISlotSymbol DeepClone()
     {
-        return new ColorSymbol(this);
+        var clone = (ColorSymbol)this.MemberwiseClone();
+        switch (SymbolTier)
+        {
+            case TierFirst:
+                clone.SymbolTier = new TierFirst();
+                break;
+            case TierSecond:
+                clone.SymbolTier = new TierSecond();
+                break;
+            case TierThird:
+                clone.SymbolTier = new TierThird();
+                break;
+            case TierFourth:
+                clone.SymbolTier = new TierFourth();
+                break;
+            case TierFifth:
+                clone.SymbolTier = new TierFifth();
+                break;
+        }
+        return clone;
     }
 }

@@ -19,9 +19,9 @@
 
 - [ ] Template method – ne mažiau 2 konkrečių klasių (final arba seal).
 - [x] Iterator – iteruojama (atliekami interfeiso veiksmai) per skirtingas duomenų struktūras – ne mažiau 3 klasių.
-- [ ] Flyweight – Atlikti greitaveikos bei naudojamos atminties matavimus,
+- [x] Flyweight – Atlikti greitaveikos bei naudojamos atminties matavimus,
 - [ ] Composite – gynimo metu pakeisti realizaciją (visibility arba safetiness), paaiškinti skirtumą nuo Decorator
-- [ ] State – būsenų diagrama – ne mažiau 4 būsenų, paaiškinti skirtumą nuo Strategy,
+- [x] State – būsenų diagrama – ne mažiau 4 būsenų, paaiškinti skirtumą nuo Strategy,
 - [ ] Proxy – gynimo metu pakeisti realizaciją (security, added functionality, delayed creation). Ataskaitoje pateikti šablono veikimo greitaveikos ir atminties naudojimo rezultatus.
 - [ ] Chain Of Responsibility – grandinėlė ne trumpesnė nei iš 4 elementų.
 - [x] Visitor – ne mažiau 3 visitor klasių.

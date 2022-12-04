@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OPP_Projektas.Shared.Models.Flyweight
+namespace OPP_Projektas.Shared.Models.FireworksFlyweight
 {
     public class FlyweightFactory
     {

@@ -6,7 +6,8 @@
 @using OPP_Projektas.Shared.Models.Slots.SlotSymbols
 @using OPP_Projektas.Shared.Models.Slots.SlotSymbols.Rollers
 @using OPP_Projektas.Shared.Models.Styles
-@using OPP_Projektas.Shared.Models.Flyweight;
+@using OPP_Projektas.Shared.Models.FireworksFlyweight;
+@using OPP_Projektas.Shared.Models.State;
 @inject NavigationManager NavigationManager
 
 <PageTitle>Slots</PageTitle>
@@ -35,34 +36,48 @@
 </div>
 </div>
     @{
-        if(needFireworks){
-
-            Random rand = new Random();
-            for(int i = 0;i<allFireworks.Count;i++){ // flyweight
-                int choice = rand.Next(3);
-                string url = "";
-                switch(choice){
-                    case 0:
-                        url = "assets/fireworks1.gif";
-                        break;
-                    case 1:
-                        url = "assets/fireworks2.gif";
-                        break;
-                    case 2:
-                        url = "assets/fireworks3.gif";
-                        break;
-                    default:
-                        url = "assets/fireworks4.gif";
-                        break;
+        
+        if(slotMachineState is WinBigState || slotMachineState is WinSmallState){
+            if (useFlyweightFireworks) // flyweight
+            { 
+                slotMachineState.CreateFirworks();
+                List<Flyweight> fireworksToDisplay = slotMachineState.GetAllFireworks();
+                Random rand = new Random();
+                foreach (Flyweight firework in fireworksToDisplay) 
+                {
+                    int choice = rand.Next(3);
+                    string url = "";
+                    switch (choice)
+                    {
+                        case 0:
+                            url = "assets/fireworks1.gif";
+                            break;
+                        case 1:
+                            url = "assets/fireworks2.gif";
+                            break;
+                        case 2:
+                            url = "assets/fireworks3.gif";
+                            break;
+                        default:
+                            url = "assets/fireworks4.gif";
+                            break;
+                    }
+                    @((MarkupString)firework.GetImage(url))
+                    ;
                 }
-                @((MarkupString)allFireworks[i].GetImage(url));
             }
-            DeleteFireworks();
-            /*for (int i = 0; i < allFireworksNFW.Count; i++) // not flyweight
-            {
-                @((MarkupString)allFireworksNFW[i].GetImage());
+            else
+            { // not flyweight
+                slotMachineState.CreateFirworksNFW();
+                List<NotFlyweight> fireworksToDisplay = slotMachineState.GetAllFireworksNFW();
+                foreach (NotFlyweight firework in fireworksToDisplay) 
+                {
+                    @((MarkupString)firework.GetImage())
+                    ;
+                }
             }
-            DeleteFireworksNFW();*/
+
+            WaitAndDelete();
     }
 }
     <div style="margin: 50px">
@@ -148,12 +163,10 @@
     public ISlotsMachineStyle SlotsMachineStyle { get; set; }
     public SlotType SlotType { get; set; } = SlotType.Simple;
 
-    bool needFireworks = false;
-    FlyweightFactory flyweightFactory = new FlyweightFactory();
-    //List<RenderFragment> allFireworks = new List<RenderFragment>();
-    List<Flyweight> allFireworks = new List<Flyweight>();
-    List<NotFlyweight> allFireworksNFW = new List<NotFlyweight>();
+    SlotMachineState slotMachineState = new IdleState();
+    bool useFlyweightFireworks =false;
 
+    
     protected override async Task OnInitializedAsync()
     {
         SlotsMachineStyle = _style.CreateSlotsMachineStyle();
@@ -196,7 +209,7 @@
                         break;
                 }
             }
-
+            var a = this;
             result = new SlotsResult(tiers, resultEnum.Item1);
 
             SlotRoller fakeResultRoller;
@@ -208,7 +221,6 @@
                 if(i>0){
                     switchingAmount /= 2;
                 }
-
                 for (int j = 0; j < switchingAmount; j++)
                 {
                     switch(i){
@@ -229,8 +241,9 @@
             }
 
             Balance += result.Payout;
-            if (result.Payout > 1)
+            if (result.Payout >= 150)
             {
+                SetSlotMachineState(new WinBigState(), false);
                 await hubConnection.SendAsync("BroadcastWin", Name, result.Payout);
             }
             if (result.Payout == 0)
@@ -245,6 +258,7 @@
                 }
                 else if (result.Payout > 0)
                 {
+
                     Message = $"WINNNEEEERRRR +{result.Payout}";
                 }
                 else if (result.Payout < 0)
@@ -254,6 +268,9 @@
             }
             else
             {
+                if(result.Payout < 150){
+                    SetSlotMachineState(new WinSmallState(), false);
+                }
                 Message = $"WINNNEEEERRRR +{result.Payout}";
             }
             await InvokeAsync(StateHasChanged);
@@ -262,15 +279,6 @@
         hubConnection.On<string>("WinBroadcasted", async(result) =>
         {
             Messages.Insert(0, result);
-            await InvokeAsync(StateHasChanged);
-            for (int i = 0; i < 1000;i++){
-                allFireworks.Add(CreateFireworks());
-            }
-            /*for (int i = 0; i < 1000; i++)
-            {
-                allFireworksNFW.Add(CreateFireworksNFW());
-            }*/
-            needFireworks = true;
             await InvokeAsync(StateHasChanged);
         });
 
@@ -284,6 +292,7 @@
         Message = "";
         if (hubConnection is not null)
         {
+            SetSlotMachineState(new PlayingState(), false);
             Balance -= BetSize;
             await hubConnection.SendAsync("Play", Name, BetSize, IsPictureSymbols, SlotType);
         }
@@ -300,26 +309,6 @@
         SlotType = type;
         await InvokeAsync(StateHasChanged);
     }
-
-    private string StyleForSymbol(Symbols symbol)
-    {
-        switch (symbol)
-        {
-            case Symbols.Orange:
-                return "background-color: #FFA500; width: 100px; height: 100px; margin: 10px;";
-            case Symbols.Red:
-                return "background-color: #FF0000; width: 100px; height: 100px; margin: 10px;";
-            case Symbols.Blue:
-                return "background-color: #0000FF; width: 100px; height: 100px; margin: 10px;";
-            case Symbols.Green:
-                return "background-color: #00FF00; width: 100px; height: 100px; margin: 10px;";
-            case Symbols.Yellow:
-                return "background-color: #FFFF00; width: 100px; height: 100px; margin: 10px;";
-            default:
-                return "background-color: #FFFFFF; width: 100px; height: 100px; margin: 10px;";
-        }
-    }
-
     private async Task ChangeSlotsStyle()
     {
         if (typeof(DefaultStyle) == _style.GetType())
@@ -339,7 +328,24 @@
         }
         await InvokeAsync(StateHasChanged);
     }
-
+    private string StyleForSymbol(Symbols symbol)
+    {
+        switch (symbol)
+        {
+            case Symbols.Orange:
+                return "background-color: #FFA500; width: 100px; height: 100px; margin: 10px;";
+            case Symbols.Red:
+                return "background-color: #FF0000; width: 100px; height: 100px; margin: 10px;";
+            case Symbols.Blue:
+                return "background-color: #0000FF; width: 100px; height: 100px; margin: 10px;";
+            case Symbols.Green:
+                return "background-color: #00FF00; width: 100px; height: 100px; margin: 10px;";
+            case Symbols.Yellow:
+                return "background-color: #FFFF00; width: 100px; height: 100px; margin: 10px;";
+            default:
+                return "background-color: #FFFFFF; width: 100px; height: 100px; margin: 10px;";
+        }
+    }
     private string GetSlotPayout(ISymbolTier tier, SlotType type)
     {
         if (type == SlotType.Simple)
@@ -398,59 +404,25 @@
         }
         throw new ArgumentOutOfRangeException(nameof(type));
     }
-    private Flyweight CreateFireworks(){
-        Random rand = new Random();
-        int top = rand.Next(100);
-        int bottom = rand.Next(100);
-        int left = rand.Next(100);
-        int right = rand.Next(100);
-
-        Fireworks fireworks = new Fireworks(top, bottom, left, right);
-
-        return flyweightFactory.GetFlyweight(fireworks);
+    public async void SetSlotMachineState(SlotMachineState newState, bool stateHasChanged){
+        newState.SetContext(slotMachineState.GetFlyweightFactory(), slotMachineState.GetAllFireworks(), slotMachineState.GetAllFireworksNFW());
+        slotMachineState = newState;
+        if(stateHasChanged){
+            await InvokeAsync(StateHasChanged);
+        }
     }
-    private NotFlyweight CreateFireworksNFW()
+    private async void WaitAndDelete()
     {
-        Random rand = new Random();
-        int top = rand.Next(100);
-        int bottom = rand.Next(100);
-        int left = rand.Next(100);
-        int right = rand.Next(100);
-
-        Fireworks fireworks = new Fireworks(top, bottom, left, right);
-
-        int choice = rand.Next(3);
-        string url = "";
-        switch (choice)
+        await Task.Delay(3000);
+        if (useFlyweightFireworks)
         {
-            case 0:
-                url = "assets/fireworks1.gif";
-                break;
-            case 1:
-                url = "assets/fireworks2.gif";
-                break;
-            case 2:
-                url = "assets/fireworks3.gif";
-                break;
-            default:
-                url = "assets/fireworks4.gif";
-                break;
+            slotMachineState.DeleteFirworks();
+        }
+        else
+        {
+            slotMachineState.DeleteFirworksNFW();
         }
 
-        return new NotFlyweight(fireworks, url);
-    }
-    private async void DeleteFireworks()
-    {
-        await Task.Delay(3000);
-        allFireworks.Clear();
-        needFireworks = false;
-        await InvokeAsync(StateHasChanged);
-    }
-    private async void DeleteFireworksNFW()
-    {
-        await Task.Delay(3000);
-        allFireworksNFW.Clear();
-        needFireworks = false;
-        await InvokeAsync(StateHasChanged);
+        SetSlotMachineState(new IdleState(), true);
     }
 }

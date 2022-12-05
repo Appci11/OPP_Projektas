@@ -8,7 +8,7 @@ using OPP_Projektas.Shared.Models.Slots.SlotSymbols.Rollers;
 
 namespace OPP_Projektas.Server.Models.Slots;
 
-public class Slots
+public class Slots : ISlots
 {
     private static Slots? _instance = null;
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using OPP_Projektas.Server.Models.Slots;
+using OPP_Projektas.Server.Models.Slots.Proxies;
 using OPP_Projektas.Shared.Models.Enums.Slots;
 using OPP_Projektas.Shared.Models.Enums.Slots;
 using OPP_Projektas.Shared.Models.Slots;
@@ -15,7 +16,8 @@ public class SlotsHub : Hub
         Console.WriteLine("icri1");
         ISymbolTier garbage = new TierFirst();
 
-        var slots = Slots.GetInstance();
+        var slots = new SlotsManager();
+        //var slots = new BonusSlotsManager();
         SlotsResult win = slots.Play(betSize, isPictureSymbols, slotType);
         Console.WriteLine("win: "+win.Payout);
 

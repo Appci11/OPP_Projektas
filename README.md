@@ -23,7 +23,7 @@
 - [ ] Composite – gynimo metu pakeisti realizaciją (visibility arba safetiness), paaiškinti skirtumą nuo Decorator
 - [x] State – būsenų diagrama – ne mažiau 4 būsenų, paaiškinti skirtumą nuo Strategy,
 - [x] Proxy – gynimo metu pakeisti realizaciją (security, added functionality, delayed creation). Ataskaitoje pateikti šablono veikimo greitaveikos ir atminties naudojimo rezultatus.
-- [ ] Chain Of Responsibility – grandinėlė ne trumpesnė nei iš 4 elementų.
+- [x] Chain Of Responsibility – grandinėlė ne trumpesnė nei iš 4 elementų.
 - [x] Visitor – ne mažiau 3 visitor klasių.
 - [ ] Interpreter - panaudojimas komandoms per concole.
 - [ ] Mediator – parodyti tarpininkavimą tarp mažiausiai 3 skirtingų klasių, mokėti paaiškinti skirtumą su Observer.

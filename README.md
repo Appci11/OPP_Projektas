@@ -22,7 +22,7 @@
 - [x] Flyweight – Atlikti greitaveikos bei naudojamos atminties matavimus,
 - [ ] Composite – gynimo metu pakeisti realizaciją (visibility arba safetiness), paaiškinti skirtumą nuo Decorator
 - [x] State – būsenų diagrama – ne mažiau 4 būsenų, paaiškinti skirtumą nuo Strategy,
-- [ ] Proxy – gynimo metu pakeisti realizaciją (security, added functionality, delayed creation). Ataskaitoje pateikti šablono veikimo greitaveikos ir atminties naudojimo rezultatus.
+- [x] Proxy – gynimo metu pakeisti realizaciją (security, added functionality, delayed creation). Ataskaitoje pateikti šablono veikimo greitaveikos ir atminties naudojimo rezultatus.
 - [ ] Chain Of Responsibility – grandinėlė ne trumpesnė nei iš 4 elementų.
 - [x] Visitor – ne mažiau 3 visitor klasių.
 - [ ] Interpreter - panaudojimas komandoms per concole.

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using OPP_Projektas.Server.Models.Chat.Command;
+using OPP_Projektas.Server.Models.Chat.FilterChain;
 using OPP_Projektas.Server.Models.Chat.Memento;
 using OPP_Projektas.Shared.Models.Chat;
 
@@ -43,6 +44,19 @@ namespace OPP_Projektas.Server.GameHubs
             foreach (var mmm in originator._messages)
             {
                 Console.WriteLine(mmm.Username + " " + mmm.Msg);
+            }
+
+            var filterChain =
+                new SwearWordHandler(new LithuanianSwearWordHandler(new PasswordAskerHandler(new AskHowHandler(null))));
+
+            var filterResult = filterChain.Handle(message);
+            if (!filterResult.passed)
+            {
+                var filterResponseMessage = new Message("Admin", filterResult.value);
+                ModifyMessages.SetCommand(new ImplementedCommands(receiver, CommandsEnum.Add, filterResponseMessage));
+                ModifyMessages.Invoke();
+                await Clients.Caller.SendAsync("ReceiveMessages", Messages);
+                return;
             }
 
             ModifyMessages.SetCommand(new ImplementedCommands(receiver, CommandsEnum.Add, msg));

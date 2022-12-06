@@ -27,4 +27,4 @@
 - [x] Visitor – ne mažiau 3 visitor klasių.
 - [ ] Interpreter - panaudojimas komandoms per concole.
 - [ ] Mediator – parodyti tarpininkavimą tarp mažiausiai 3 skirtingų klasių, mokėti paaiškinti skirtumą su Observer.
-- [x] Memento – Saugus “secure” duomenų atstatymas, kad kitos klasės negautų prieigos prie duomenų. Only loads 1st save. Changable with extra UI.
+- [x] Memento – Saugus “secure” duomenų atstatymas, kad kitos klasės negautų prieigos prie duomenų.

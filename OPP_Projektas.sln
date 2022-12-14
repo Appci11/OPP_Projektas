@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\Unit
 		{687207C0-364A-485E-86E1-6AFFA50F0DDC} = {687207C0-364A-485E-86E1-6AFFA50F0DDC}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OPP_Projektas.SonarQube", "OPP_Projektas.SonarQube\OPP_Projektas.SonarQube.csproj", "{61CA269A-8DA4-4302-9E5E-1CD13767264E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{BC63A46B-4483-457D-AFD1-2624B92AE5F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BC63A46B-4483-457D-AFD1-2624B92AE5F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BC63A46B-4483-457D-AFD1-2624B92AE5F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61CA269A-8DA4-4302-9E5E-1CD13767264E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61CA269A-8DA4-4302-9E5E-1CD13767264E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61CA269A-8DA4-4302-9E5E-1CD13767264E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61CA269A-8DA4-4302-9E5E-1CD13767264E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

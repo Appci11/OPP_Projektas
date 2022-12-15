@@ -30,7 +30,7 @@ namespace UnitTests.RouletteServer
             // Assert
             Assert.Equal(expected: $"Greatest winning: {expect}", actual: actual);
         }
-        [Fact(Skip = "NotImplemented")]
+        [Fact(Skip = "Not to implement")]
         public void ThrowsExceptionOnNegativeValueFound()
         {
             // Arrange

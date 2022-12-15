@@ -10,7 +10,7 @@ namespace OPP_Projektas.Server.Models.Roulette.Visitor
     {
         public int VisitConcreteComponentA(ConcreteComponent element)
         {
-            return element.ReturnMultiplayer() * 32;
+            return element.ReturnMultiplayer() * 36;
         }
     }
 }

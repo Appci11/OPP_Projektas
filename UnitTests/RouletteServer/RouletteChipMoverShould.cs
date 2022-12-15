@@ -55,7 +55,7 @@ namespace UnitTests.RouletteServer
             // Act
             rouletteChipMover.DecideChipMovement();
             // Assert
-            Assert.Equal(expected: 320, actual: users[0].Winnings);
+            Assert.Equal(expected: 360, actual: users[0].Winnings);
         }
 
         [Fact]

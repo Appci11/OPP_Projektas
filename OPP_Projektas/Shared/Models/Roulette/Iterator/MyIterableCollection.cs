@@ -35,8 +35,8 @@ namespace OPP_Projektas.Shared.Models.Roulette.Iterator
                 return _collection[position];
             }
             int n = _count - position;
-            string eil = "User1";
-            return eil;
+            //string eil = "User1";
+            return _uniqueUsers.ElementAt<string>(n - 1);
         }
 
         public void AddToLog(string item)

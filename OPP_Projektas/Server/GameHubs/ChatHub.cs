@@ -81,7 +81,7 @@ namespace OPP_Projektas.Server.GameHubs
             caretaker.Backup("Save1"); // galima ir pakeist save pavadinima netingint...
             Messages.Add(new Message("System", "Messages Saved"));
             await Clients.Client(Context.ConnectionId).SendAsync("GetMementosCount", 777);
-            await Clients.All.SendAsync("ReceiveMessages", Messages);            
+            await Clients.All.SendAsync("ReceiveMessages", Messages);
         }
         public async Task LoadMemento(int i)
         {

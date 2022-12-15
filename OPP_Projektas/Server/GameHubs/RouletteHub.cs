@@ -49,7 +49,7 @@ namespace OPP_Projektas.Server.GameHubs
             Users.RemoveAt(index);
             await Clients.All.SendAsync("GetPlayerCount", Users.Count);
             await Clients.All.SendAsync("GetBetsPlacedCount", betsCount);
-            
+
             if (betsCount >= Users.Count)
             {
                 await RollANumber();
@@ -129,8 +129,6 @@ namespace OPP_Projektas.Server.GameHubs
 
         public async Task SendMessages()
         {
-            
-                        
             foreach (string message in Facade.GenerateMessages())
             {
                 await Clients.All.SendAsync("GetMessage", message);
@@ -157,6 +155,34 @@ namespace OPP_Projektas.Server.GameHubs
                 result.Add(kriu);
             }
             await Clients.Client(Context.ConnectionId).SendAsync("GetLog", result);
+        }
+
+        public async Task GetCommandMessage(string cmdMessage)
+        {
+            //await Clients.All.SendAsync("GetMessage", "Some1 sent command message: " + cmdMessage);
+            await Clients.Client(Context.ConnectionId).SendAsync("GetMessage", "I sent command message: " + cmdMessage);
+
+            //visiem issiuncia po 100
+            //foreach (RouletteUser user in Users)
+            //{
+            //    await Clients.Client(user.GameId).SendAsync("GetWinnings", 100);
+            //}
+
+
+            //zinutes siuntejui issiuncia 100
+            //veikia ir su -100, jei tarkim sumastom persiust zetonus kitam zaidejui ar grupei
+            //await Clients.Client(Context.ConnectionId).SendAsync("GetWinnings", 100);
+
+            //zinutes siuntejui
+            //await Clients.Client(Context.ConnectionId).SendAsync("GetMessage", "Player count: " + Users.Count);
+
+            //dar sitas gali pravers jei pagal username kazko ieskom
+            //tarkim kitam zaidejui persiust zetonus uzsimanom
+            // by id, get username (is kur is anksto zinotum id neisivaizduoju, gal kokiam adminui praverstu)
+            //string username = Users.FirstOrDefault(u => u.GameId == Context.ConnectionId).Username;
+            // by username, get id
+            //string userId = Users.FirstOrDefault(u => u.Username == cmdMessage).GameId;
+            //if (userId != null) await Clients.Client(Context.ConnectionId).SendAsync("GetMessage", userId);
         }
     }
 }

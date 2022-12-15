@@ -68,6 +68,15 @@ else
             <li>@message</li>
         }
     </ul>
+
+    <input 
+        @bind-value="cmdMessage"
+        placeholder="command"
+        @bind-value:event="oninput"
+        @onkeyup="HandleInput"
+        class="form-control"
+        style="width: 60%;">
+
     <br />
     <button class="btn btn-primary" @onclick="LoadRouletteLog">Load Log</button>
     <br />
@@ -88,13 +97,31 @@ else
     int BetNumber = 0;
     private List<string> messages = new List<string>();
 
-    bool hide = true;
+        bool hide = true;
 
     static ChipsKeeper Keeper = new ChipsKeeper();
     static IChipsConverter Adapter = new ChipsAdapter(Keeper);
     NewChipsKeeper NewKeeper = new NewChipsKeeper(Adapter.GetChips());
     //await LocalStorage.SetItemAsync("token", token);  //local storage example
     //await LocalStorage.RemoveItemAsync("token");  //galima ir asString, pasigooglinsit jei reiks
+
+
+    private string cmdMessage = string.Empty;
+
+        private async Task HandleInput(KeyboardEventArgs args)
+    {
+        if (args.Key.Equals("Enter"))
+        {
+            if (hubConnection != null)
+            {
+                //siuncia signala i signalR hub
+                //Console.WriteLine("Ieita i HandleInput");
+                await hubConnection.SendAsync("GetCommandMessage", cmdMessage);
+                cmdMessage = string.Empty;
+            }
+        }
+    }
+
 
     private async Task Connect()
     {
@@ -108,7 +135,7 @@ else
         hubConnection.On<string>("GetMessage", (message) =>
         {
             var msg = message;
-            if (messages.Count < 5)
+            if (messages.Count < 10)
             {
                 messages.Add(msg);
             }

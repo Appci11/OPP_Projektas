@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 
-namespace OPP_Projektas.Client.Models.BlackJack;
+namespace OPP_Projektas.Shared.Models.BlackJack;
 
 public class BlackJackDealer : Player
 {

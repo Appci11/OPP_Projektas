@@ -1,5 +1,4 @@
-﻿using OPP_Projektas.Client.Models.BlackJack;
-using OPP_Projektas.Shared.Models.BlackJack;
+﻿using OPP_Projektas.Shared.Models.BlackJack;
 using OPP_Projektas.Shared.Models.Enums;
 
 namespace OPP_Projektas.Shared.Models;

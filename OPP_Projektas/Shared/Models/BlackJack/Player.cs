@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
-using OPP_Projektas.Shared.Models.BlackJack;
 using OPP_Projektas.Shared.Models.Enums;
 
-namespace OPP_Projektas.Client.Models.BlackJack;
+namespace OPP_Projektas.Shared.Models.BlackJack;
 
 /// <summary>
 /// Template
@@ -54,12 +53,17 @@ public abstract class Player
 
     public void Stand()
     {
-        HubConnection.SendAsync("PlayerStand", Id);
+        if (GetType() == typeof(BlackJackPlayer))
+        {
+            Console.WriteLine("Player stands");
+        }
+        else
+            throw new InvalidOperationException("Dealer cannot stand");
     }
 
     public void RequestCard()
     {
-        HubConnection.SendAsync("PlayerRequestCard", Id);
+        HubConnection.SendAsync("DrawCard", Id);
     }
 
     public abstract void ChooseAction();

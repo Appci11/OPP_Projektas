@@ -2,7 +2,6 @@
 using OPP_Projektas.Shared.Models.BlackJack;
 using OPP_Projektas.Shared.Models.Enums;
 using Microsoft.AspNetCore.SignalR;
-using OPP_Projektas.Client.Models.BlackJack;
 
 namespace OPP_Projektas.Server.Models.BlackJack;
 
@@ -52,38 +51,32 @@ public class BlackJackTable
     {
         BlackJackGameState = BlackJackGameState.DealerPhase;
         
-        // await _hub.Clients.All.SendAsync("InitialDealPhase");
         await Clients.All.SendAsync("InitialDealPhase");
         foreach (var player in Players)
         {
             var card = Deck.Draw();
             player.Cards.Add(card);
-            // await _hub.Clients.All.SendAsync("CardDealt", player.Id.ToString(), card);
             await Task.Delay(1000);
-            await Clients.All.SendAsync("CardDealt", player.Id.ToString(), card);
+            await Clients.All.SendAsync("CardDealt", player.Id, card);
         }
 
         var dealerCard = Deck.Draw();
         Dealer.Cards.Add(dealerCard);
-        // await _hub.Clients.All.SendAsync("CardDealt", "Dealer", Deck.Draw());
         await Task.Delay(1000);
-        await Clients.All.SendAsync("CardDealt", "Dealer", Deck.Draw());
+        await Clients.All.SendAsync("CardDealt", Dealer.Id, Deck.Draw());
 
         foreach (var player in Players)
         {
             var card = Deck.Draw();
             player.Cards.Add(card);
-            // await _hub.Clients.All.SendAsync("CardDealt", player.Id.ToString(), card);
             await Task.Delay(1000);
-            await Clients.All.SendAsync("CardDealt", player.Id.ToString(), card);
+            await Clients.All.SendAsync("CardDealt", player.Id, card);
         }
 
         dealerCard = Deck.Draw();
         Dealer.Cards.Add(dealerCard);
         await Task.Delay(1000);
-        // await _hub.Clients.All.SendAsync("CardDealt", "Dealer", Deck.Draw());
-        // await _hub.Clients.All.SendAsync("InitialDealPhaseOver");
-        await Clients.All.SendAsync("CardDealt", "Dealer", Deck.Draw());
+        await Clients.All.SendAsync("CardDealt", Dealer.Id, Deck.Draw());
         await Clients.All.SendAsync("InitialDealPhaseOver");
     }
 

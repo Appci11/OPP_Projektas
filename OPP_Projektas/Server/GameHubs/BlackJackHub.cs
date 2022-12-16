@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using OPP_Projektas.Client.Models.BlackJack;
 using OPP_Projektas.Server.Services;
+using OPP_Projektas.Shared.Models.BlackJack;
 
 namespace OPP_Projektas.Server.GameHubs;
 
@@ -11,10 +11,12 @@ public class BlackJackHub : Hub
     public BlackJackHub(BlackJackTableServices blackJackTableServices)
     {
         _blackJackTableServices = blackJackTableServices;
+        _blackJackTableServices.Clients = Clients;
     }
 
     public async Task CreateNewTable(BlackJackDealer dealer)
     {
+        _blackJackTableServices.Clients = Clients;
         var table = _blackJackTableServices.CreateTable(dealer);
         await Clients.All.SendAsync("TableCreated", table);
     }
@@ -22,24 +24,27 @@ public class BlackJackHub : Hub
     public async Task PlayerJoined(BlackJackPlayer player)
     {
         _blackJackTableServices.Clients = Clients;
-        await Clients.All.SendAsync("NewPlayerJoined", player);
         await _blackJackTableServices.AddPlayer(player);
+        await Clients.All.SendAsync("NewPlayerJoined", player);
     }
 
-    public async Task PlayerBet(Guid playerId, int betSize)
+    public async Task PlayerBet(BlackJackPlayer player, int betSize)
     {
-        await _blackJackTableServices.PlayerBet(playerId, betSize);
+        _blackJackTableServices.Clients = Clients;
+        await _blackJackTableServices.PlayerBet(player, betSize);
     }
     
-    public async Task Play(BlackJackPlayer player)
+    public async Task Play()
     {
+        _blackJackTableServices.Clients = Clients;
         await _blackJackTableServices.Play();
     }
     
-    public async Task DrawCard(string playerId)
+    public async Task DrawCard(Player player)
     {
-        // var card = _blackJackTable.Deck.Draw();
-        // await Task.Delay(1000);
-        // await Clients.All.SendAsync("CardDealt", playerId, card);
+        _blackJackTableServices.Clients = Clients;
+        var card = _blackJackTableServices.DrawCard();
+        await Task.Delay(1000);
+        await Clients.All.SendAsync("CardDealt", player, card);
     }
 }

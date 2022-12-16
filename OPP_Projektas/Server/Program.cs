@@ -19,7 +19,7 @@ builder.Services.AddResponseCompression(options =>
 );
 //-----
 builder.Services.AddSingleton<IRouletteServices, RouletteServices>();
-builder.Services.AddScoped<BlackJackTableServices>();
+builder.Services.AddSingleton<BlackJackTableServices>();
 
 var app = builder.Build();
 

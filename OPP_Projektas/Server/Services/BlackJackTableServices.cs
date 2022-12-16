@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using OPP_Projektas.Client.Models.BlackJack;
 using OPP_Projektas.Server.Models.BlackJack;
+using OPP_Projektas.Shared.Models.BlackJack;
+using OPP_Projektas.Shared.Models.Enums;
 
 namespace OPP_Projektas.Server.Services;
 
@@ -21,21 +22,15 @@ public class BlackJackTableServices
         }
     }
 
-    public async Task PlayerBet(Guid playerId, int betSize)
+    public async Task PlayerBet(BlackJackPlayer player, int betSize)
     {
-        var player = _table.Players.FirstOrDefault(jackPlayer => jackPlayer.Id.Equals(playerId));
-        if (player is null)
-        {
-            return;
-        }
-
-        player.Bet = betSize;
-        _playersBet++;
-
         if (_timerStopped)
         {
             throw new InvalidOperationException("Bets are closed!");
         }
+        
+        player.Bet = betSize;
+        _playersBet++;
 
         if (_playersBet == _table.Players.Count)
         {
@@ -53,8 +48,18 @@ public class BlackJackTableServices
 
     public BlackJackTable CreateTable(BlackJackDealer dealer)
     {
-        _table = new BlackJackTable(dealer);
+        _table = new BlackJackTable(dealer)
+        {
+            Clients = Clients,
+            BlackJackGameState = BlackJackGameState.Stopped
+        };
+
         return _table;
+    }
+
+    public BlackJackCard DrawCard()
+    {
+        return _table.Deck.Draw();
     }
     
     private async Task RunTimer()
@@ -74,11 +79,10 @@ public class BlackJackTableServices
     private async void OnTimerElapsed(object? state)
     {
         _totalTime--;
-        
-        if (_totalTime <= 0)
-        {
-            _timerStopped = true;
-            await Clients.All.SendAsync("BettingPhaseDone");
-        }
+        Console.WriteLine($"Time left: {_totalTime}");
+        if (_totalTime > 0) 
+            return;
+        _timerStopped = true;
+        await Clients.All.SendAsync("BettingPhaseDone");
     }
 }

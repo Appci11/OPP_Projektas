@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 using OPP_Projektas.Shared.Models.Enums;
 
-namespace OPP_Projektas.Client.Models.BlackJack;
+namespace OPP_Projektas.Shared.Models.BlackJack;
 
 public class BlackJackPlayer : Player
 {
@@ -13,6 +13,8 @@ public class BlackJackPlayer : Player
     {
         get
         {
+            if (Cards.Count < 2)
+                return false;
             var firstTwoValues = Cards[0].ScoreValue + Cards[1].ScoreValue;
             return firstTwoValues is >= 9 and >= 11;
         }

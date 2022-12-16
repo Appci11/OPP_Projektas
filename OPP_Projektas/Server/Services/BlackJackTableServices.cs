@@ -8,37 +8,35 @@ namespace OPP_Projektas.Server.Services;
 public class BlackJackTableServices
 {
     private BlackJackTable _table;
-    private bool _timerStopped = true;
+    private Timer _timer;
     public IHubCallerClients Clients;
     private int _playersBet = 0;
     private int _totalTime = 60;
 
     public async Task AddPlayer(BlackJackPlayer player)
     {
+        System.Console.WriteLine("Adding player to the table");
         _table.Players.Add(player);
         if (_table.Players.Count == 1)
         {
+            System.Console.WriteLine("Launching bet timer");
             await RunTimer();
         }
     }
 
     public async Task PlayerBet(BlackJackPlayer player, int betSize)
     {
-        if (_timerStopped)
-        {
-            throw new InvalidOperationException("Bets are closed!");
-        }
-        
         player.Bet = betSize;
         _playersBet++;
+        await Clients.All.SendAsync("UpdatePlayer", player);
 
         if (_playersBet == _table.Players.Count)
         {
             await Clients.All.SendAsync("BettingPhaseDone");
+            await _timer.DisposeAsync();
             return;
         }
 
-        await Clients.All.SendAsync("UpdatePlayer", player);
     }
     
     public async Task Play()
@@ -64,25 +62,18 @@ public class BlackJackTableServices
     
     private async Task RunTimer()
     {
-        _timerStopped = false;
-        var timer = new Timer(OnTimerElapsed, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
+        _timer = new Timer(OnTimerElapsed, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
         await Clients.All.SendAsync("BettingPhaseStarted");
-        while (!_timerStopped)
-        {
-            if (_timerStopped)
-            {
-                await timer.DisposeAsync();
-            }
-        }
     }
     
     private async void OnTimerElapsed(object? state)
     {
         _totalTime--;
         Console.WriteLine($"Time left: {_totalTime}");
-        if (_totalTime > 0) 
-            return;
-        _timerStopped = true;
-        await Clients.All.SendAsync("BettingPhaseDone");
+        if (_totalTime <= 0)
+        {
+            await _timer.DisposeAsync();
+            await Clients.All.SendAsync("BettingPhaseDone");
+        }
     }
 }

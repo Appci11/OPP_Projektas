@@ -71,7 +71,7 @@
     private static readonly int _maxBet = 100;
 
     public BlackJackPlayer Player = new(_hubConnection, _maxBet);
-    public readonly BlackJackDealer Dealer = new(_hubConnection);
+    public BlackJackDealer Dealer = new(_hubConnection);
 
     public string Message { get; set; }
     public int BetSize { get; set; } = 1;
@@ -79,7 +79,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Player.Balance = 500;
         CardsStyle = _style.CreateCardsStyle();
         _hubConnection = new HubConnectionBuilder()
             .WithUrl(NavigationManager.ToAbsoluteUri("/blackjackhub"))
@@ -104,6 +103,7 @@
             Message = "Betting done!";
             _hideBetBtn = true;
             _hideTable = false;
+            await _timer.DisposeAsync();
             await _hubConnection.SendAsync("Play");
             await InvokeAsync(StateHasChanged);
         });
@@ -119,8 +119,8 @@
         {
             if (playerId.Equals(Dealer.Id))
             {
-                Dealer.Cards.Add(card);
                 Message = "";
+                Dealer.Cards.Add(card);
             }
             else
             {
@@ -128,19 +128,25 @@
                 Message = "";
                 if (_initialPhaseDone && !_hidePlayButtons)
                 {
-                    await _hubConnection.SendAsync("DrawCard", "Dealer");
                     Message = "Dealer drawing card";
+                    Dealer.RequestCard();
                 }
             }
             CheckWinner(Dealer.Cards.Sum(c => c.ScoreValue), Player.Cards.Sum(c => c.ScoreValue));
             await InvokeAsync(StateHasChanged);
         });
 
-        _hubConnection.On("BettingPhaseDone", () => { Message = "Betting finished. Dealer drawing cards"; });
+        _hubConnection.On("BettingPhaseDone", () =>
+        {
+            Message = "Betting finished. Dealer drawing cards"; 
+            _hideBetBtn = true;
+        });
 
         await _hubConnection.StartAsync();
         Console.WriteLine("Connection established");
-
+        Player.HubConnection = _hubConnection;
+        Dealer.HubConnection = _hubConnection;
+        Player.Balance = 500;
         await _hubConnection.SendAsync("CreateNewTable", Dealer);
         await InvokeAsync(StateHasChanged);
     }
@@ -215,8 +221,10 @@
     {
         if (_hubConnection is not null)
         {
+            Message = "Joined";
             await _hubConnection.SendAsync("PlayerJoined", Player);
             _hideJoinButton = true;
+            await InvokeAsync(StateHasChanged);
         }
     }
 

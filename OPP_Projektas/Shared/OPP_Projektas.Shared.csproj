@@ -12,9 +12,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client.Core" Version="6.0.9" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Models\Mediator" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.1.0" />
   </ItemGroup>
 </Project>

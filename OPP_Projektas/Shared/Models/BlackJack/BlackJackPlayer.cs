@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 using OPP_Projektas.Shared.Models.Enums;
+using OPP_Projektas.Shared.Models.Mediator;
 
 namespace OPP_Projektas.Shared.Models.BlackJack;
 
-public class BlackJackPlayer : Player
+public class BlackJackPlayer : Player, IColleague
 {
+    private IMediator _mediator;
     public int Balance { get; set; }
  
     public int MaxBet { get; set; }
@@ -16,13 +18,17 @@ public class BlackJackPlayer : Player
             if (Cards.Count < 2)
                 return false;
             var firstTwoValues = Cards[0].ScoreValue + Cards[1].ScoreValue;
-            return firstTwoValues is >= 9 and >= 11;
+            return firstTwoValues is >= 9 and <= 11;
         }
     }
+
+    public BlackJackAction ActionChoise {get;set;}
     
-    public BlackJackPlayer(HubConnection hubConnection, int maxBet) : base(hubConnection)
+    public BlackJackPlayer(HubConnection hubConnection, int maxBet, IMediator mediator) : base(hubConnection)
     {
         MaxBet = maxBet;
+        _mediator = mediator;
+        _mediator.AddColleague(this);
     }
 
     public override void ChooseAction()
@@ -42,16 +48,24 @@ public class BlackJackPlayer : Player
         }
     }
 
-    public BlackJackAction ChooseHitOrStandAction(BlackJackAction action)
+    public BlackJackAction ChooseHitOrStandAction()
     {
-        if (action is not BlackJackAction.Hit or BlackJackAction.Stand){
-            throw new InvalidOperationException("Must choose between stand or hit");
-        }
-        return action;
+        return ActionChoise;
     }
 
     public BlackJackAction ChooseDoubleDownAction()
     {
-        return BlackJackAction.DoubleDown;
+        return ActionChoise;
+    }
+
+    public void ReceiveMessage(string message)
+    {
+        ActionChoise = message switch
+        {
+            "Hit" => BlackJackAction.Hit,
+            "Stand" => BlackJackAction.Stand,
+            "DoubleDown" => BlackJackAction.DoubleDown,
+            _ => BlackJackAction.None
+        };
     }
 }

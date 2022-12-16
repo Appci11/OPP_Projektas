@@ -1,7 +1,9 @@
 ﻿@page "/blackjack"
 @using OPP_Projektas.Shared.Models.BlackJack
 @using OPP_Projektas.Shared.Models.Styles
-@using OPP_Projektas.Shared.Models.Cards
+@using OPP_Projektas.Shared.Models.Enums
+@using OPP_Projektas.Shared.Models.Mediator
+@using OPP_Projektas.Server.Models.BlackJack
 @inject NavigationManager NavigationManager
 
 <PageTitle>BlackJack</PageTitle>
@@ -70,8 +72,10 @@
     private int totalTime = 60;
     private static readonly int _maxBet = 100;
 
-    public BlackJackPlayer Player = new(_hubConnection, _maxBet);
-    public BlackJackDealer Dealer = new(_hubConnection);
+    public static IMediator Mediator { get; set; } = new Mediator();
+    public BlackJackPlayer Player = new(_hubConnection, _maxBet, Mediator);
+    public BlackJackDealer Dealer = new(_hubConnection, Mediator);
+    public BlackJackTable Table;
 
     public string Message { get; set; }
     public int BetSize { get; set; } = 1;
@@ -85,6 +89,11 @@
             .WithAutomaticReconnect()
             .Build();
 
+        _hubConnection.On<BlackJackTable>("TableCreated", (table) =>
+        {
+            Table = table;
+            Mediator.SendMessage("BuildSet", Table);
+        });
         _hubConnection.On<BlackJackPlayer>("UpdatePlayer", (player) =>
         {
             Player = player;
@@ -129,7 +138,7 @@
                 if (_initialPhaseDone && !_hidePlayButtons)
                 {
                     Message = "Dealer drawing card";
-                    Dealer.RequestCard();
+                    Dealer.TakeTurn();
                 }
             }
             CheckWinner(Dealer.Cards.Sum(c => c.ScoreValue), Player.Cards.Sum(c => c.ScoreValue));
@@ -147,7 +156,7 @@
         Player.HubConnection = _hubConnection;
         Dealer.HubConnection = _hubConnection;
         Player.Balance = 500;
-        await _hubConnection.SendAsync("CreateNewTable", Dealer);
+        await _hubConnection.SendAsync("CreateNewTable", Dealer, Mediator);
         await InvokeAsync(StateHasChanged);
     }
 
@@ -271,7 +280,8 @@
     {
         if (_hubConnection != null)
         {
-            Player.RequestCard();
+            Mediator.SendMessage("Hit", Player);
+            Player.TakeTurn();
             Message = "Drawing card..";
             _loading = true;
             await InvokeAsync(StateHasChanged);
@@ -282,8 +292,9 @@
     {
         if (_hubConnection != null)
         {
-            Player.Stand();
-            Dealer.RequestCard();
+            Mediator.SendMessage("Hit", "Stand");
+            Player.TakeTurn();
+            Dealer.TakeTurn();
             _playerStands = true;
             _loading = true;
             Message = "You stand!";
@@ -297,7 +308,8 @@
     {
         if (_hubConnection != null)
         {
-            Player.DoubleDown();
+            Mediator.SendMessage("Hit", "DoubleDown");
+            Player.TakeTurn();
             _loading = true;
             Message = "You chose to double down!";
 

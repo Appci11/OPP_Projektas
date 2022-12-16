@@ -1,12 +1,13 @@
-﻿using OPP_Projektas.Server.GameHubs;
-using OPP_Projektas.Shared.Models.BlackJack;
+﻿using OPP_Projektas.Shared.Models.BlackJack;
 using OPP_Projektas.Shared.Models.Enums;
 using Microsoft.AspNetCore.SignalR;
+using OPP_Projektas.Shared.Models.Mediator;
 
 namespace OPP_Projektas.Server.Models.BlackJack;
 
-public class BlackJackTable
+public class BlackJackTable : IColleague
 {
+    private IMediator _mediator;
     public int MinBet { get; set; }
     public int MaxBet { get; set; }
     public double BlackJackRatio { get; set; } = 1.5;
@@ -16,16 +17,16 @@ public class BlackJackTable
     public BlackJackDealer Dealer { get; set; }
     public IHubCallerClients Clients { get; set; }
     
-    public BlackJackTable(BlackJackDealer dealer)
+    public BlackJackTable(BlackJackDealer dealer, IMediator mediator)
     {
         Players = new List<BlackJackPlayer>();
         Dealer = dealer;
         MinBet = 1;
         MaxBet = 100;
-
-        BuildBlackJackSet();
+        _mediator = mediator;
+        _mediator.AddColleague(this);
     }
-    
+
     private void BuildBlackJackSet()
     {
         var builder = new BlackJackSetBuilder();
@@ -83,5 +84,13 @@ public class BlackJackTable
     private bool IsGameStopped()
     {
         return BlackJackGameState == BlackJackGameState.Stopped;
+    }
+
+    public void ReceiveMessage(string message)
+    {
+        if (message.Equals("BuildSet"))
+        {
+            BuildBlackJackSet();
+        }
     }
 }

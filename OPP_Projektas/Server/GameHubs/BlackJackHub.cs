@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using OPP_Projektas.Server.Services;
 using OPP_Projektas.Shared.Models.BlackJack;
+using OPP_Projektas.Shared.Models.Mediator;
 
 namespace OPP_Projektas.Server.GameHubs;
 
@@ -14,11 +15,11 @@ public class BlackJackHub : Hub
         _blackJackTableServices.Clients = Clients;
     }
 
-    public async Task CreateNewTable(BlackJackDealer dealer)
+    public async Task CreateNewTable(BlackJackDealer dealer, IMediator mediator)
     {
         System.Console.WriteLine("Creating new table");
         _blackJackTableServices.Clients = Clients;
-        var table = _blackJackTableServices.CreateTable(dealer);
+        var table = _blackJackTableServices.CreateTable(dealer, mediator);
         await Clients.All.SendAsync("TableCreated", table);
     }
     

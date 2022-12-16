@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Models\BlackJack" />
     <Folder Include="Models\BlackJack\" />
     <Folder Include="Models\Slots\Proxies\" />
   </ItemGroup>

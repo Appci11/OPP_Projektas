@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 using OPP_Projektas.Shared.Models.Enums;
+using OPP_Projektas.Shared.Models.Mediator;
 
 namespace OPP_Projektas.Shared.Models.BlackJack;
 
-public class BlackJackDealer : Player
+public class BlackJackDealer : Player, IColleague
 {
+    private IMediator _mediator;
+    
     public override void ChooseAction()
     {
         var currentHandValue = Cards.Sum(c => c.ScoreValue);
@@ -22,7 +25,17 @@ public class BlackJackDealer : Player
         }
     }
 
-    public BlackJackDealer(HubConnection hubConnection) : base(hubConnection)
+    public BlackJackDealer(HubConnection hubConnection, IMediator mediator) : base(hubConnection)
     {
+        this._mediator = mediator;
+        _mediator.AddColleague(this);
+    }
+
+    public void ReceiveMessage(string message)
+    {
+        if (message.Equals("Cheat"))
+        {
+            HubConnection.SendAsync("DealerCheat", Id);
+        }
     }
 }

@@ -2,6 +2,7 @@
 using OPP_Projektas.Server.Models.BlackJack;
 using OPP_Projektas.Shared.Models.BlackJack;
 using OPP_Projektas.Shared.Models.Enums;
+using OPP_Projektas.Shared.Models.Mediator;
 
 namespace OPP_Projektas.Server.Services;
 
@@ -44,9 +45,9 @@ public class BlackJackTableServices
         await _table.Play();
     }
 
-    public BlackJackTable CreateTable(BlackJackDealer dealer)
+    public BlackJackTable CreateTable(BlackJackDealer dealer, IMediator mediator)
     {
-        _table = new BlackJackTable(dealer)
+        _table = new BlackJackTable(dealer, mediator)
         {
             Clients = Clients,
             BlackJackGameState = BlackJackGameState.Stopped

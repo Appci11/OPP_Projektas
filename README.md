@@ -26,5 +26,5 @@
 - [x] Chain Of Responsibility – grandinėlė ne trumpesnė nei iš 4 elementų.
 - [x] Visitor – ne mažiau 3 visitor klasių.
 - [ ] Interpreter - panaudojimas komandoms per concole.
-- [ ] Mediator – parodyti tarpininkavimą tarp mažiausiai 3 skirtingų klasių, mokėti paaiškinti skirtumą su Observer.
+- [x] Mediator – parodyti tarpininkavimą tarp mažiausiai 3 skirtingų klasių, mokėti paaiškinti skirtumą su Observer.
 - [x] Memento – Saugus “secure” duomenų atstatymas, kad kitos klasės negautų prieigos prie duomenų.

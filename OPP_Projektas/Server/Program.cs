@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.ResponseCompression;
 using OPP_Projektas.Server.GameHubs;
+using OPP_Projektas.Server.Services;
 using OPP_Projektas.Server.Services.RouletteServices;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +19,7 @@ builder.Services.AddResponseCompression(options =>
 );
 //-----
 builder.Services.AddSingleton<IRouletteServices, RouletteServices>();
+builder.Services.AddScoped<BlackJackTableServices>();
 
 var app = builder.Build();
 

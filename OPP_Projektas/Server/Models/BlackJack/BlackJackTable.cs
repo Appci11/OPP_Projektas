@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http.Connections;
-using Microsoft.AspNetCore.Http.Connections.Client;
-using OPP_Projektas.Server.GameHubs;
+﻿using OPP_Projektas.Server.GameHubs;
 using OPP_Projektas.Shared.Models.BlackJack;
 using OPP_Projektas.Shared.Models.Enums;
 using Microsoft.AspNetCore.SignalR;
@@ -9,6 +7,7 @@ namespace OPP_Projektas.Server.Models.BlackJack;
 
 public class BlackJackTable
 {
+    private Guid _id;
     public int MinBet { get; set; }
     public int MaxBet { get; set; }
     public double BlackJackRatio { get; set; } = 1.5;
@@ -26,8 +25,9 @@ public class BlackJackTable
         BuildBlackJackSet();
     }
 
-    public BlackJackTable()
+    public BlackJackTable(Guid tableId)
     {
+        _id = tableId;
         Players = new List<BlackJackPlayer>();
         DealerCards = new List<BlackJackCard>();
         MinBet = 1;

@@ -1,9 +1,8 @@
 ﻿@page "/blackjack"
 @using OPP_Projektas.Shared.Models.BlackJack
-@using OPP_Projektas.Shared.Models.Observer
 @using OPP_Projektas.Shared.Models.Styles
+@using OPP_Projektas.Shared.Models.Cards
 @inject NavigationManager NavigationManager
-@implements OPP_Projektas.Shared.Models.Observer.IObserver
 
 <PageTitle>BlackJack</PageTitle>
 <div style="display:flex">
@@ -11,7 +10,7 @@
         <h1>BlackJack</h1>
 
         <div>
-            <p role="status">Balance: @BlackJackPlayer.Balance</p>
+            <p role="status">Balance: @PlayerBalance</p>
             <p role="status">@Message</p>
         </div>
 
@@ -27,13 +26,13 @@
                 }
             </tr>
             <tr>
-                @foreach (var card in BlackJackPlayer.Cards)
+                @foreach (var card in PlayerCards)
                 {
                     <td style="@CardsStyle.RenderCardBorder()">@card.Suit.ToString() | @card.FaceValue.ToString()</td>
                 }
-                @if(BlackJackPlayer.Cards.Count > 0)
+                @if(PlayerCards.Count > 0)
                 {
-                    <td>@BlackJackPlayer.Cards.Sum(c => c.ScoreValue)</td>
+                    <td>@PlayerCards.Sum(c => c.ScoreValue)</td>
                 }
             </tr>
         </table>
@@ -43,7 +42,7 @@
 <button class="btn btn-primary" hidden="@_hideJoinButton" @onclick="JoinTable">Join table</button>
 <div hidden="@_hideStartGameBtn">
     <input @bind="BetSize" type="number" aria-label="Bet size:"/>
-    <button class="btn btn-primary" @onclick="StartGame">Start game</button>
+    <button class="btn btn-primary" @onclick="Bet">Place Bet</button>
 </div>
 <div hidden="@_hidePlayButtons">
     <button disabled="@_loading" class="btn btn-primary" @onclick="DrawCard">Hit me!</button>
@@ -54,7 +53,7 @@
 
 @code {
     private IStyle _style = new DefaultStyle();
-    private HubConnection? _hubConnection;
+    private static HubConnection? _hubConnection;
     private Guid _tableId = Guid.NewGuid();
     private Guid _playerId = Guid.NewGuid();
     private bool _hideJoinButton;
@@ -65,9 +64,16 @@
     private bool _initialPhaseDone;
     private bool _hideTable;
     private bool _playerStands;
+    private Timer _timer;
+    private int totalTime = 60;
 
-    public BlackJackPlayer BlackJackPlayer { get; set; } = new();
-    public List<BlackJackCard> DealerCards { get; set; }
+    public Guid PlayerId = Guid.NewGuid();
+    public List<BlackJackCard> PlayerCards = new();
+    public int PlayerBalance = 0;
+    
+    public Guid DealerId { get; set; } = Guid.NewGuid();
+    public List<BlackJackCard> DealerCards = new();
+    
     public string Message { get; set; }
     public int BetSize { get; set; } = 1;
     public ICardStyle CardsStyle { get; set; }
@@ -75,17 +81,26 @@
     protected override async Task OnInitializedAsync()
     {
         CardsStyle = _style.CreateCardsStyle();
-        DealerCards = new List<BlackJackCard>();
         _hubConnection = new HubConnectionBuilder()
             .WithUrl(NavigationManager.ToAbsoluteUri("/blackjackhub"))
             .WithAutomaticReconnect()
             .Build();
 
-        _hubConnection.On<BlackJackPlayer>("NewPlayerJoined", NewPlayerJoined);
-        _hubConnection.On("BettingPhaseDone", () =>
+        _hubConnection.On("UpdatePlayer", () =>
+        {
+            InvokeAsync(StateHasChanged);
+        });
+        _hubConnection.On<Guid, int>("NewPlayerJoined", NewPlayerJoined);
+        _hubConnection.On("BettingPhaseStarted", () =>
+        {
+            Message = "Betting ends in: 60 seconds";
+            RunTimer();
+        });
+        _hubConnection.On("BettingPhaseDone", async () =>
         {
             Message = "Betting done!";
-            BlackJackPlayer.Balance -= BetSize;
+
+            await InvokeAsync(StateHasChanged);
         });
         _hubConnection.On("InitialDealPhase", () => Message = "Dealing cards..");
         _hubConnection.On("InitialDealPhaseOver", async () =>
@@ -95,33 +110,32 @@
             _initialPhaseDone = true;
             await InvokeAsync(StateHasChanged);
         });
-        _hubConnection.On<string, BlackJackCard?>("CardDealt", async (playerId, card) =>
+        _hubConnection.On<Guid, Card>("CardDealt", async (playerId, card) =>
         {
-            if (card is null)
-                return;
-
-            if (playerId.Equals("Dealer"))
-            {
-                DealerCards.Add(card);
-                Message = "";
-            }
-            else
-            {
-                BlackJackPlayer.Cards.Add(card);
-                Message = "";
-                if (_initialPhaseDone && !_hidePlayButtons)
-                {
-                    await _hubConnection.SendAsync("DrawCard", "Dealer");
-                    Message = "Dealer drawing card";
-                }
-            }
-            CheckWinner(DealerCards.Sum(c => c.ScoreValue), BlackJackPlayer.Cards.Sum(c => c.ScoreValue));
+            // if (card is null)
+            //     return;
+            //
+            // if (playerId.Equals("Dealer"))
+            // {
+            //     Dealer.Cards.Add(card);
+            //     Message = "";
+            // }
+            // else
+            // {
+            //     BlackJackPlayer.Cards.Add(card);
+            //     Message = "";
+            //     if (_initialPhaseDone && !_hidePlayButtons)
+            //     {
+            //         await _hubConnection.SendAsync("DrawCard", "Dealer");
+            //         Message = "Dealer drawing card";
+            //     }
+            // }
+            // CheckWinner(Dealer.Cards.Sum(c => c.ScoreValue), BlackJackPlayer.Cards.Sum(c => c.ScoreValue));
             await InvokeAsync(StateHasChanged);
         });
 
-        _hubConnection.On<BlackJackPlayer>("BettingPhaseDone", player =>
+        _hubConnection.On("BettingPhaseDone" , () =>
         {
-            BlackJackPlayer = player;
             Message = "Betting finished. Dealer drawing cards";
         });
         
@@ -133,7 +147,7 @@
 
     private void Payouts()
     {
-        BlackJackPlayer.Balance += (int)(BlackJackPlayer.Bet * 1.5);
+        // BlackJackPlayer.Balance += (int)(BlackJackPlayer.Bet * 1.5);
     }
     
     private void CheckWinner(int dealerScore, int playerScore)
@@ -188,7 +202,7 @@
         {
             Message = "Draw!";
             SetupRestartButton();
-            BlackJackPlayer.Balance += BlackJackPlayer.Bet;
+            // BlackJackPlayer.Balance += BlackJackPlayer.Bet;
         }
     }
 
@@ -207,24 +221,19 @@
         }
     }
 
-    private async Task NewPlayerJoined(BlackJackPlayer player)
+    private async Task NewPlayerJoined(Guid playerId, int balance)
     {
-        Console.WriteLine($"New player joined {player.Id} with balance {player.Balance}");
-        BlackJackPlayer = player;
-        BlackJackPlayer.Attach(this);
+        Console.WriteLine($"New player joined {playerId} with balance {balance}");
         _hideStartGameBtn = false;
 
         await InvokeAsync(StateHasChanged);
     }
 
-    private async Task StartGame()
+    private async Task Bet()
     {
-        Reset();
         if (_hubConnection is not null)
         {
-            BlackJackPlayer.Bet = BetSize;
-
-            await _hubConnection.SendAsync("Play", BlackJackPlayer);
+            await _hubConnection.SendAsync("PlayerBet", PlayerId, BetSize);
             _hideStartGameBtn = true;
             _hideTable = false;
             
@@ -256,7 +265,7 @@
     {
         if (_hubConnection != null)
         {
-            await _hubConnection.SendAsync("DrawCard", BlackJackPlayer.Id.ToString());
+            await _hubConnection.SendAsync("DrawCard", PlayerId.ToString());
             Message = "Drawing card..";
             _loading = true;
             await InvokeAsync(StateHasChanged);
@@ -280,20 +289,26 @@
     private void Reset()
     {
         DealerCards = new List<BlackJackCard>();
-        BlackJackPlayer.Cards = new List<BlackJackCard>();
+        PlayerCards = new List<BlackJackCard>();
     }
 
-    public void Update(ISubject subject)
+    private void RunTimer()
     {
-        if (subject is not Subject casted) 
-            return;
-        
-        switch (casted.PropertyName)
+        _timer = new Timer(OnTimerElapsed, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
+    }
+
+    private async void OnTimerElapsed(object? state)
+    {
+        totalTime--;
+        Message = $"Betting ends in: {totalTime} seconds";
+
+        if (totalTime <= 0)
         {
-            case "Bet":
-                BlackJackPlayer.Balance -= BlackJackPlayer.Bet;
-                break;
+            Message = "Betting finished";
+            await _timer.DisposeAsync();
         }
+
+        await InvokeAsync(StateHasChanged);
     }
 
 } 

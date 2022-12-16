@@ -42,13 +42,16 @@ public class BlackJackPlayer : Player
         }
     }
 
-    public BlackJackAction ChooseHitOrStandAction()
+    public BlackJackAction ChooseHitOrStandAction(BlackJackAction action)
     {
-        throw new NotImplementedException();
+        if (action is not BlackJackAction.Hit or BlackJackAction.Stand){
+            throw new InvalidOperationException("Must choose between stand or hit");
+        }
+        return action;
     }
 
     public BlackJackAction ChooseDoubleDownAction()
     {
-        throw new NotImplementedException();
+        return BlackJackAction.DoubleDown;
     }
 }

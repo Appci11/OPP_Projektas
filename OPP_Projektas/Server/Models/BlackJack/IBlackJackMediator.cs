@@ -1,5 +1,5 @@
-﻿using OPP_Projektas.Shared.Models.BlackJack;
-using OPP_Projektas.Shared.Models.Cards;
+﻿using OPP_Projektas.Client.Models.BlackJack;
+using OPP_Projektas.Shared.Models.BlackJack;
 using OPP_Projektas.Shared.Models.Enums;
 
 namespace OPP_Projektas.Shared.Models;
@@ -12,12 +12,12 @@ public interface IBlackJackMediator
 
 public class BlackJackMediator : IBlackJackMediator
 {
-    private Player player;
+    private BlackJackPlayer player;
     private BlackJackDealer dealer;
 
     public BlackJackDeck Deck { get; set; }
 
-    public BlackJackMediator(Player player, BlackJackDealer dealer)
+    public BlackJackMediator(BlackJackPlayer player, BlackJackDealer dealer)
     {
         this.player = player;
         this.dealer = dealer;

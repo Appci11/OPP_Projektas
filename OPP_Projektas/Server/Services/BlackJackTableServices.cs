@@ -1,20 +1,19 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using OPP_Projektas.Client.Models.BlackJack;
 using OPP_Projektas.Server.Models.BlackJack;
-using OPP_Projektas.Shared.Models.BlackJack;
 
 namespace OPP_Projektas.Server.Services;
 
 public class BlackJackTableServices
 {
     private BlackJackTable _table;
-    public bool TimerStopped = true;
+    private bool _timerStopped = true;
     public IHubCallerClients Clients;
-    private int playersBet = 0;
-    private int totalTime = 60;
+    private int _playersBet = 0;
+    private int _totalTime = 60;
 
-    public async Task AddPlayer(BlackJackPlayer player, Guid tableGuid)
+    public async Task AddPlayer(BlackJackPlayer player)
     {
-        _table = new BlackJackTable(tableGuid);
         _table.Players.Add(player);
         if (_table.Players.Count == 1)
         {
@@ -31,13 +30,14 @@ public class BlackJackTableServices
         }
 
         player.Bet = betSize;
-        
-        if (TimerStopped)
+        _playersBet++;
+
+        if (_timerStopped)
         {
             throw new InvalidOperationException("Bets are closed!");
         }
 
-        if (playersBet == _table.Players.Count)
+        if (_playersBet == _table.Players.Count)
         {
             await Clients.All.SendAsync("BettingPhaseDone");
             return;
@@ -46,14 +46,25 @@ public class BlackJackTableServices
         await Clients.All.SendAsync("UpdatePlayer", player);
     }
     
+    public async Task Play()
+    {
+        await _table.Play();
+    }
+
+    public BlackJackTable CreateTable(BlackJackDealer dealer)
+    {
+        _table = new BlackJackTable(dealer);
+        return _table;
+    }
+    
     private async Task RunTimer()
     {
-        TimerStopped = false;
+        _timerStopped = false;
         var timer = new Timer(OnTimerElapsed, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
         await Clients.All.SendAsync("BettingPhaseStarted");
-        while (!TimerStopped)
+        while (!_timerStopped)
         {
-            if (TimerStopped)
+            if (_timerStopped)
             {
                 await timer.DisposeAsync();
             }
@@ -62,17 +73,12 @@ public class BlackJackTableServices
     
     private async void OnTimerElapsed(object? state)
     {
-        totalTime--;
+        _totalTime--;
         
-        if (totalTime <= 0)
+        if (_totalTime <= 0)
         {
-            TimerStopped = true;
+            _timerStopped = true;
             await Clients.All.SendAsync("BettingPhaseDone");
         }
-    }
-
-    public async Task Play()
-    {
-        throw new NotImplementedException();
     }
 }

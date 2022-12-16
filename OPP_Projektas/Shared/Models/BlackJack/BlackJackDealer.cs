@@ -1,4 +1,4 @@
-﻿using OPP_Projektas.Shared.Models.BlackJack;
+﻿using Microsoft.AspNetCore.SignalR.Client;
 
 namespace OPP_Projektas.Client.Models.BlackJack;
 
@@ -9,4 +9,7 @@ public class BlackJackDealer : Player
         throw new NotImplementedException();
     }
 
+    public BlackJackDealer(HubConnection hubConnection) : base(hubConnection)
+    {
+    }
 }

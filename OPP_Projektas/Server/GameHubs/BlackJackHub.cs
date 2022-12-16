@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using OPP_Projektas.Client.Models.BlackJack;
 using OPP_Projektas.Server.Services;
-using OPP_Projektas.Shared.Models.BlackJack;
 
 namespace OPP_Projektas.Server.GameHubs;
 
@@ -13,16 +13,17 @@ public class BlackJackHub : Hub
         _blackJackTableServices = blackJackTableServices;
     }
 
-    public async Task PlayerJoined(Guid userId, Guid tableId)
+    public async Task CreateNewTable(BlackJackDealer dealer)
+    {
+        var table = _blackJackTableServices.CreateTable(dealer);
+        await Clients.All.SendAsync("TableCreated", table);
+    }
+    
+    public async Task PlayerJoined(BlackJackPlayer player)
     {
         _blackJackTableServices.Clients = Clients;
-        var player = new BlackJackPlayer()
-        {
-            Balance = 500, Id = userId,
-            TableJoinedGuid = tableId
-        };
         await Clients.All.SendAsync("NewPlayerJoined", player);
-        await _blackJackTableServices.AddPlayer(player, tableId);
+        await _blackJackTableServices.AddPlayer(player);
     }
 
     public async Task PlayerBet(Guid playerId, int betSize)

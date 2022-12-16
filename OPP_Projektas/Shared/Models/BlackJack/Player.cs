@@ -9,13 +9,21 @@ namespace OPP_Projektas.Client.Models.BlackJack;
 /// </summary>
 public abstract class Player
 {
+    protected Player(HubConnection hubConnection)
+    {
+        ChosenAction = BlackJackAction.None;
+        HubConnection = hubConnection;
+        Id = Guid.NewGuid();
+        Bet = 0;
+    }
+
     public HubConnection HubConnection { get; set; }
     public Guid Id { get; set; }
     public int Bet { get; set; }
     
     public List<BlackJackCard> Cards { get; set; } = new();
     
-    protected BlackJackAction ChosenAction = BlackJackAction.None;
+    protected BlackJackAction ChosenAction;
 
     public void TakeTurn()
     {

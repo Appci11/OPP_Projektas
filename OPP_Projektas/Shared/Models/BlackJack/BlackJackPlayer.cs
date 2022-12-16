@@ -1,5 +1,4 @@
-﻿using OPP_Projektas.Shared.Models;
-using OPP_Projektas.Shared.Models.BlackJack;
+﻿using Microsoft.AspNetCore.SignalR.Client;
 using OPP_Projektas.Shared.Models.Enums;
 
 namespace OPP_Projektas.Client.Models.BlackJack;
@@ -18,27 +17,25 @@ public class BlackJackPlayer : Player
             return firstTwoValues is >= 9 and >= 11;
         }
     }
+    
+    public BlackJackPlayer(HubConnection hubConnection, int maxBet) : base(hubConnection)
+    {
+        MaxBet = maxBet;
+    }
 
     public override void ChooseAction()
     {
         var currentHandValue = Cards.Sum(c => c.ScoreValue);
-        if (currentHandValue > 21)
+        switch (currentHandValue)
         {
-            ChosenAction = BlackJackAction.Stand;
-        }
-        else if (currentHandValue == 21)
-        {
-            ChosenAction = BlackJackAction.Stand;
-        }
-        else
-        {
-            if (CanDoubleDown && Bet < MaxBet)
+            case > 21:
+            case 21:
+                ChosenAction = BlackJackAction.Stand;
+                break;
+            default:
             {
-                ChosenAction = ChooseDoubleDownAction();
-            }
-            else
-            {
-                ChosenAction = ChooseHitOrStandAction();
+                ChosenAction = CanDoubleDown && Bet < MaxBet ? ChooseDoubleDownAction() : ChooseHitOrStandAction();
+                break;
             }
         }
     }

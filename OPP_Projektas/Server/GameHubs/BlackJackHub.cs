@@ -1,37 +1,54 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using OPP_Projektas.Server.Models.BlackJack;
+using OPP_Projektas.Server.Services;
 using OPP_Projektas.Shared.Models.BlackJack;
+using OPP_Projektas.Shared.Models.Mediator;
 
 namespace OPP_Projektas.Server.GameHubs;
 
 public class BlackJackHub : Hub
 {
-    private BlackJackTable _blackJackTable = new();
+    private readonly BlackJackTableServices _blackJackTableServices;
 
-    public async Task PlayerJoined(Guid userId, Guid tableId)
+    public BlackJackHub(BlackJackTableServices blackJackTableServices)
     {
-        var player = new BlackJackPlayer {Balance = 500, Id = userId};
-        await Clients.All.SendAsync("NewPlayerJoined", player);
-        DoTheBadThing(player);
-        //TODO TableService.AddPlayer(player, tableId)
+        _blackJackTableServices = blackJackTableServices;
+        _blackJackTableServices.Clients = Clients;
     }
 
-    public async Task Play(BlackJackPlayer player)
+    public async Task CreateNewTable(BlackJackDealer dealer, IMediator mediator)
     {
-        DoTheBadThing(player);
-        await _blackJackTable.Play();
+        System.Console.WriteLine("Creating new table");
+        _blackJackTableServices.Clients = Clients;
+        var table = _blackJackTableServices.CreateTable(dealer, mediator);
+        await Clients.All.SendAsync("TableCreated", table);
     }
     
-    public async Task DrawCard(string playerId)
+    public async Task PlayerJoined(BlackJackPlayer player)
     {
-        var card = _blackJackTable.Deck.Draw();
+        _blackJackTableServices.Clients = Clients;
+        Console.WriteLine("Player joined");
+        await _blackJackTableServices.AddPlayer(player);
+        await Clients.All.SendAsync("NewPlayerJoined", player);
+    }
+
+    public async Task PlayerBet(BlackJackPlayer player, int betSize)
+    {
+        System.Console.WriteLine("Player betting");
+        _blackJackTableServices.Clients = Clients;
+        await _blackJackTableServices.PlayerBet(player, betSize);
+    }
+    
+    public async Task Play()
+    {
+        _blackJackTableServices.Clients = Clients;
+        await _blackJackTableServices.Play();
+    }
+    
+    public async Task DrawCard(Guid playerId)
+    {
+        _blackJackTableServices.Clients = Clients;
+        var card = _blackJackTableServices.DrawCard();
         await Task.Delay(1000);
         await Clients.All.SendAsync("CardDealt", playerId, card);
-    }
-    
-    private void DoTheBadThing(BlackJackPlayer player)
-    {
-        _blackJackTable.Clients = Clients;
-        _blackJackTable.Players.Add(player);
     }
 }

@@ -26,4 +26,8 @@
     <ProjectReference Include="..\Shared\OPP_Projektas.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Models\BlackJack" />
+  </ItemGroup>
+
 </Project>

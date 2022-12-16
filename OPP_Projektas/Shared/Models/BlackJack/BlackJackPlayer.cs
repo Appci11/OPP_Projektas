@@ -1,51 +1,71 @@
-﻿using OPP_Projektas.Shared.Models.Observer;
+﻿using Microsoft.AspNetCore.SignalR.Client;
+using OPP_Projektas.Shared.Models.Enums;
+using OPP_Projektas.Shared.Models.Mediator;
 
 namespace OPP_Projektas.Shared.Models.BlackJack;
 
-public class BlackJackPlayer : Subject
+public class BlackJackPlayer : Player, IColleague
 {
-    private Guid _id;
-    private int _balance;
-    private List<BlackJackCard> _cards = new List<BlackJackCard>();
-    private int _bet;
+    private IMediator _mediator;
+    public int Balance { get; set; }
+ 
+    public int MaxBet { get; set; }
 
-    public Guid Id
+    public bool CanDoubleDown
     {
-        get => _id;
-        set
+        get
         {
-            _id = value;
-            OnPropertyChanged(nameof(Id));
+            if (Cards.Count < 2)
+                return false;
+            var firstTwoValues = Cards[0].ScoreValue + Cards[1].ScoreValue;
+            return firstTwoValues is >= 9 and <= 11;
         }
     }
 
-    public int Balance
+    public BlackJackAction ActionChoise {get;set;}
+    
+    public BlackJackPlayer(HubConnection hubConnection, int maxBet, IMediator mediator) : base(hubConnection)
     {
-        get => _balance;
-        set
+        MaxBet = maxBet;
+        _mediator = mediator;
+        _mediator.AddColleague(this);
+    }
+
+    public override void ChooseAction()
+    {
+        var currentHandValue = Cards.Sum(c => c.ScoreValue);
+        switch (currentHandValue)
         {
-            _balance = value;
-            OnPropertyChanged(nameof(Balance));
+            case > 21:
+            case 21:
+                ChosenAction = BlackJackAction.Stand;
+                break;
+            default:
+            {
+                ChosenAction = CanDoubleDown && Bet < MaxBet ? ChooseDoubleDownAction() : ChooseHitOrStandAction();
+                break;
+            }
         }
     }
 
-    public List<BlackJackCard> Cards
+    public BlackJackAction ChooseHitOrStandAction()
     {
-        get => _cards;
-        set
-        {
-            _cards = value;
-            OnPropertyChanged(nameof(Cards));
-        }
+        return ActionChoise;
     }
 
-    public int Bet
+    public BlackJackAction ChooseDoubleDownAction()
     {
-        get => _bet;
-        set
+        return ActionChoise;
+    }
+
+    public void ReceiveMessage(string message)
+    {
+        ActionChoise = message switch
         {
-            _bet = value;
-            OnPropertyChanged(nameof(Bet));   
-        }
+            "Hit" => BlackJackAction.Hit,
+            "Stand" => BlackJackAction.Stand,
+            "DoubleDown" => BlackJackAction.DoubleDown,
+            _ => BlackJackAction.None
+        };
     }
 }
